@@ -1,0 +1,1 @@
+# squad-admin-configurator
