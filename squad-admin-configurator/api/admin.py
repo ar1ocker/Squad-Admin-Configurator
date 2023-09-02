@@ -51,7 +51,16 @@ class RoleWebhookAdmin(admin.ModelAdmin):
                                          'duration_until_end'),
                     'allow_custom_duration_until_end',
                     'active_and_increase_common_date_of_end'
-                ]
+                ],
+                'description': ('При запросе данных вебхуков - на установленных '
+                                'ниже серверах будут выданы'
+                                ' роли, запрос должен быть в формате json и '
+                                'содержать поля "steam_id", "name" (имя, которым'
+                                ' будет назван пользователь если не будет '
+                                'найден по "steam_id"), "comment" и '
+                                '"duration_until_end" (время на которое '
+                                'выдается роль, если разрешено устанавливать '
+                                'время в запросе)')
             }
         ),
         (
@@ -63,7 +72,10 @@ class RoleWebhookAdmin(admin.ModelAdmin):
                     ('hmac_hash_type', 'hmac_secret_key'),
                     ('hmac_header', 'hmac_header_regex'),
                     'request_sender'
-                ]
+                ],
+                'description': ('HMAC - это фактически подпись, которая '
+                                'позволяет убедиться, что запрос пришел от '
+                                'того, у кого есть секретный ключ')
             }
         )
     ]

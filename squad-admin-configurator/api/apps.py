@@ -8,4 +8,4 @@ class ApiConfig(AppConfig):
 
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'api'
-    verbose_name = 'Конфигурация API'
+    verbose_name = '2. Конфигурация API'
