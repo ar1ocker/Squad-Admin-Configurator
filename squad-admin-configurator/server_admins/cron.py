@@ -21,7 +21,7 @@ class CreateAdminsConfig(CronJobBase):
 class DisablingServerPrivilegedByEndTime(CronJobBase):
     schedule = Schedule(run_every_mins=2)
     code = (
-        'Изменение поля is_active у пользователя по роли на конкретном сервере'
+        'Изменение поля is_active у пользователя'
     )
 
     def do(self):
@@ -66,8 +66,7 @@ class DisablingServerPrivilegedByEndTime(CronJobBase):
 
 class DisablingPrivilegedByEndTime(CronJobBase):
     schedule = Schedule(run_every_mins=2)
-    code = ('Изменение поля is_active у пользователей по '
-            'истечению времени полномочий и информирование в дискорд')
+    code = ('Изменение поля is_active у serverprivileged')
 
     def do(self):
         privileges = (
