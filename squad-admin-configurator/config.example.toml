@@ -1,24 +1,40 @@
 [ADMIN_SITE]
+# Заголовки в шапке админки
 ADMIN_SITE_HEADER = "Squad Admin Configurator"
 ADMIN_SITE_TITLE = "Управление привилегированными пользователями"
 ADMIN_INDEX_TITLE = "Squad Admin Configurator"
 
 [SERVER]
+# Базовый url, используется для генерации ссылки на страницу, когда реквест недоступен.
+# без слеша в конце
+# например: http://127.0.0.1
 BASE_URL = ""
 
 [DJANGO]
+# Секретный ключ в django, ставьте длинным, рандомным и не теряйте
 SECRET_KEY = ""
-DEBUG = true
+# Вывод дебаг информации при ошибках
+DEBUG = false
+# Включить ли встроенную Sqlite или использовать Postgresql,
+# если false - необходимо задать переменные окружения
+# POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD, DB_HOST, DB_PORT
+BUILT_IN_DATABASE = false
 ALLOWED_HOSTS = ['*']
 
 [DISCORD]
+# Отправлять ли истекшие привилегии в дискорд
 [DISCORD.EXPIRED_PRIVILEGED_CHAT]
 ENABLE = true
+# Вебхук чата, в который будут отправлены истекшие админки
 CHAT_WEBHOOK = ''
 
 [ADMINS]
+# Каталог внутри squad-admin-configurator в который будут
+# складываться сгенерированные конфиги администраторов
 ADMINS_CONFIG_DIR = 'admins_configs'
 
 [HMAC_VALIDATION]
 [HMAC_VALIDATION.BATTLEMETRICS]
+# Максимальная погрешность в секундах при которой запрос пришедший на вебхук
+# от BM будет считаться валидным
 MAX_DEVIATION_OF_TIMESTAMP_IN_SEC = 10

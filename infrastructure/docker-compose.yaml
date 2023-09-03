@@ -17,35 +17,6 @@ services:
       - db
     env_file:
       - ./.env
-  migrations:
-    build: ../squad-admin-configurator
-    profiles: ["migrations"]
-    restart: "no"
-    entrypoint: ["bash", "-c", "python3 manage.py makemigrations; python3 manage.py migrate"]
-    depends_on:
-      - squad-admin-configurator
-    env_file:
-      - ./.env
-  load-admins:
-    build: ../squad-admin-configurator
-    profiles: ["load-admins"]
-    restart: "no"
-    volumes:
-      - ./Admins.cfg:/Admins.cfg
-    entrypoint: ["bash", "-c", "python3 manage.py load_admin_config /Admins.cfg"]
-    depends_on:
-      - squad-admin-configurator
-    env_file:
-      - ./.env
-  createsuperuser:
-    build: ../squad-admin-configurator
-    profiles: ["createsuperuser"]
-    restart: "no"
-    entrypoint: ["bash", "-c", "python3 manage.py createsuperuser"]
-    depends_on:
-      - squad-admin-configurator
-    env_file:
-      - ./.env
   nginx:
     image: nginx:alpine
     ports:
