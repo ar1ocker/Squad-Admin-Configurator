@@ -49,6 +49,8 @@
 # docker exec -it infrastructure-squad-admin-configurator-1 python3 manage.py load_admin_config /Admins.cfg
 ```
 
+- По дефолту для локальных конфигураций админов Squad создается каталог **~/squad_admin_configs/**
+
 ### Ручной запуск
 
 Из папки **squad-admin-configurator/**
