@@ -1,3 +1,8 @@
+[ADMIN_SITE]
+ADMIN_SITE_HEADER = "Squad Admin Configurator"
+ADMIN_SITE_TITLE = "Управление привилегированными пользователями"
+ADMIN_INDEX_TITLE = "Squad Admin Configurator"
+
 [SERVER]
 BASE_URL = ""
 
