@@ -1,4 +1,4 @@
-FROM python:3.10-slim
+FROM python:3.10-alpine3.18
 
 WORKDIR /squad-admin-configurator
 
@@ -10,4 +10,6 @@ RUN python3 ./manage.py collectstatic --no-input
 
 RUN chmod -R o+x static
 
-CMD ["gunicorn", "squad_admin_configurator.wsgi:application", "--bind", "0:8000"]
+RUN chmod +x start.sh
+
+CMD ./start.sh
