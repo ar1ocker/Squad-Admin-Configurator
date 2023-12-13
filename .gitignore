@@ -1,4 +1,5 @@
 config.toml
+rotations/
 
 .vscode/
 # Byte-compiled / optimized / DLL files

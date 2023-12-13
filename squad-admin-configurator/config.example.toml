@@ -1,6 +1,6 @@
 [ADMIN_SITE]
 # Заголовки в шапке админки
-ADMIN_SITE_HEADER = "Squad Admin Configurator"
+ADMIN_SITE_HEADER = "Squad Configurator"
 ADMIN_SITE_TITLE = "Управление привилегированными пользователями"
 ADMIN_INDEX_TITLE = "Squad Admin Configurator"
 
@@ -38,3 +38,12 @@ ADMINS_CONFIG_DIR = 'admins_configs'
 # Максимальная погрешность в секундах при которой запрос пришедший на вебхук
 # от BM будет считаться валидным
 MAX_DEVIATION_OF_TIMESTAMP_IN_SEC = 10
+
+[ROTATIONS]
+# Каталог внутри squad-admin-configurator в который будут складываться
+# конфиги для ротаций
+ROTATIONS_CONFIG_DIR = 'rotations'
+
+[CRON]
+# Количество дней через которые будут удаляться логи об выполнении cron
+DELETE_LOGS_OLDER_THAN = 90

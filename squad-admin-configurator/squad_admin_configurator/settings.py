@@ -1,17 +1,19 @@
-from pathlib import Path
-import toml
 import os
+from pathlib import Path
+
+import toml
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-config = toml.load(BASE_DIR / 'config.toml')
+CONFIG = toml.load(BASE_DIR / "config.toml")
 
-BASE_URL = config['SERVER']['BASE_URL']
+BASE_URL = CONFIG["SERVER"]["BASE_URL"]
 
-SECRET_KEY = config['DJANGO']['SECRET_KEY']
+SECRET_KEY = CONFIG["DJANGO"]["SECRET_KEY"]
 
-DEBUG = config['DJANGO']['DEBUG']
+DEBUG = CONFIG["DJANGO"]["DEBUG"]
 
-ALLOWED_HOSTS = config['DJANGO']['ALLOWED_HOSTS']
+ALLOWED_HOSTS = CONFIG["DJANGO"]["ALLOWED_HOSTS"]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -21,6 +23,9 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "admin_ordering",
+    "server_rotations.apps.ServerRotationsConfig",
+    "server_rotations_api.apps.ServerRotationsApiConfig",
     "server_admins.apps.ServerAdminsConfig",
     "api.apps.ApiConfig",
     "django_cron",
@@ -65,32 +70,37 @@ if DEBUG:
     }
 else:
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.getenv('POSTGRES_DB'),
-            'USER': os.getenv('POSTGRES_USER'),
-            'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
-            'HOST': os.getenv('DB_HOST'),
-            'PORT': os.getenv('DB_PORT')
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.getenv("POSTGRES_DB"),
+            "USER": os.getenv("POSTGRES_USER"),
+            "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
+            "HOST": os.getenv("DB_HOST"),
+            "PORT": os.getenv("DB_PORT"),
         }
     }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        "NAME": "django.contrib.auth.password_validation"
-        ".UserAttributeSimilarityValidator",
+        "NAME": (
+            "django.contrib.auth.password_validation"
+            ".UserAttributeSimilarityValidator"
+        ),
     },
     {
-        "NAME": "django.contrib.auth.password_validation"
-        ".MinimumLengthValidator",
+        "NAME": (
+            "django.contrib.auth.password_validation.MinimumLengthValidator"
+        ),
     },
     {
-        "NAME": "django.contrib.auth.password_validation"
-        ".CommonPasswordValidator",
+        "NAME": (
+            "django.contrib.auth.password_validation.CommonPasswordValidator"
+        ),
     },
     {
-        "NAME": "django.contrib.auth.password_validation"
-        ".NumericPasswordValidator",
+        "NAME": (
+            "django.contrib.auth.password_validation.NumericPasswordValidator"
+        ),
     },
 ]
 
@@ -118,23 +128,26 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = "static/"
-STATIC_ROOT = BASE_DIR / 'static'
+STATIC_ROOT = BASE_DIR / "static"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-ADMINS_CONFIG_DIR = BASE_DIR / config['ADMINS']['ADMINS_CONFIG_DIR']
+ADMINS_CONFIG_DIR = BASE_DIR / CONFIG["ADMINS"]["ADMINS_CONFIG_DIR"]
+ROTATIONS_CONFIG_DIR = BASE_DIR / CONFIG["ROTATIONS"]["ROTATIONS_CONFIG_DIR"]
 
 CRON_CLASSES = [
-    'server_admins.cron.CreateAdminsConfig',
-    'server_admins.cron.DisablingPrivilegedByEndTime',
-    'server_admins.cron.DisablingServerPrivilegedByEndTime'
+    "server_admins.cron.CreateAdminsConfig",
+    "server_admins.cron.DisablingPrivilegedByEndTime",
+    "server_admins.cron.DisablingServerPrivilegedByEndTime",
+    "server_rotations_api.cron.CreateRotationsFiles",
 ]
+DJANGO_CRON_DELETE_LOGS_OLDER_THAN = 90
 
 TIME_FORMAT = "%d-%m-%y %H:%M:%S"
 
-DISCORD = config['DISCORD']
-HMAC_VALIDATION = config['HMAC_VALIDATION']
+DISCORD = CONFIG["DISCORD"]
+HMAC_VALIDATION = CONFIG["HMAC_VALIDATION"]
 
-ADMIN_SITE_HEADER = config['ADMIN_SITE']['ADMIN_SITE_HEADER']
-ADMIN_SITE_TITLE = config['ADMIN_SITE']['ADMIN_SITE_TITLE']
-ADMIN_INDEX_TITLE = config['ADMIN_SITE']['ADMIN_INDEX_TITLE']
+ADMIN_SITE_HEADER = CONFIG["ADMIN_SITE"]["ADMIN_SITE_HEADER"]
+ADMIN_SITE_TITLE = CONFIG["ADMIN_SITE"]["ADMIN_SITE_TITLE"]
+ADMIN_INDEX_TITLE = CONFIG["ADMIN_SITE"]["ADMIN_INDEX_TITLE"]
