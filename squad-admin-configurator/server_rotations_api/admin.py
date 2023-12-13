@@ -31,3 +31,4 @@ class RotationDistributionAdmin(admin.ModelAdmin):
     list_display_links = ["title"]
     list_filter = ["is_active", "type_of_distribution"]
     search_fields = ["title", "description"]
+    autocomplete_fields = ["rotation"]

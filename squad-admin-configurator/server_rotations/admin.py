@@ -18,6 +18,7 @@ class RotationLayersPackInline(OrderableAdmin, admin.TabularInline):
     model = RotationLayersPack
     extra = 0
     ordering_field = "queue_number"
+    autocomplete_fields = ["pack"]
 
 
 class LayerPackLayerInline(OrderableAdmin, admin.TabularInline):
@@ -25,6 +26,7 @@ class LayerPackLayerInline(OrderableAdmin, admin.TabularInline):
     model = LayerPackLayer
     extra = 0
     ordering_field = "queue_number"
+    autocomplete_fields = ["layer"]
 
 
 @admin.register(GameMode)
@@ -57,8 +59,15 @@ class LayerAdmin(admin.ModelAdmin):
     fields = ["name", "team1", "team2", "game_mode", "description"]
     list_display = ["name", "team1", "team2", "game_mode"]
     list_display_links = ["name", "team1", "team2", "game_mode"]
-    search_fields = fields
+    search_fields = [
+        "name",
+        "description",
+        "game_mode__name",
+        "team1__abbreviation",
+        "team2__abbreviation",
+    ]
     list_filter = ["game_mode", "team1", "team2"]
+    autocomplete_fields = ["game_mode", "team1", "team2"]
 
 
 @admin.register(Rotation)
@@ -84,4 +93,4 @@ class LayersPackAdmin(admin.ModelAdmin):
     list_editable = ["is_active"]
     list_display_links = ["title", "creation_date"]
     list_filter = ["is_active", "creation_date"]
-    search_fields = ["description", "layers"]
+    search_fields = ["title", "description"]
