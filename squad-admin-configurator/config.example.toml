@@ -42,7 +42,7 @@ MAX_DEVIATION_OF_TIMESTAMP_IN_SEC = 10
 [ROTATIONS]
 # Каталог внутри squad-admin-configurator в который будут складываться
 # конфиги для ротаций
-ROTATIONS_CONFIG_DIR = 'rotations'
+ROTATIONS_CONFIG_DIR = 'rotations_configs'
 
 [CRON]
 # Количество дней через которые будут удаляться логи об выполнении cron

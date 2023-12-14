@@ -13,6 +13,7 @@ services:
     volumes:
       - static_value:/squad-admin-configurator/static
       - ~/squad_admins_configs:/squad-admin-configurator/admins_configs
+      - ~/squad_rotations_configs:/squad-admin-configurator/rotations_configs
     depends_on:
       - db
     env_file:
