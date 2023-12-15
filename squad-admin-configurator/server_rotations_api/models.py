@@ -38,7 +38,10 @@ class RotationDistribution(DistributionModel):
         )
 
         pack_m2m = (
-            prefetched_pack.order_by("-start_date", "queue_number")
+            prefetched_pack.order_by(
+                F("queue_number").asc(nulls_first=True),
+                "-start_date",
+            )
             .filter(
                 Q(queue_number__gt=self.last_queue_number)
                 | Q(start_date=timezone.now() + timedelta(days=1)),
@@ -60,8 +63,8 @@ class RotationDistribution(DistributionModel):
             RotationLayersPack.objects.select_related("pack")
             .prefetch_related("pack__layers_through__layer")
             .order_by(
-                "-start_date",
                 F("queue_number").asc(nulls_first=True),
+                "-start_date",
             )
             .filter(
                 Q(queue_number=self.last_queue_number)
