@@ -1,4 +1,7 @@
 #!/bin/sh
+echo Collect static files
+python3 manage.py collectstatic --noinput
+
 echo Wait 5 seconds for database initialization
 sleep 5
 

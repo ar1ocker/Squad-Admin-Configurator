@@ -5,9 +5,7 @@ WORKDIR /squad-admin-configurator
 COPY ./ ./
 
 RUN pip3 install -r ./requirements.txt --no-cache-dir
-
-RUN python3 ./manage.py collectstatic --no-input
-
+RUN mkdir static
 RUN chmod -R o+x static
 
 RUN chmod +x start.sh
