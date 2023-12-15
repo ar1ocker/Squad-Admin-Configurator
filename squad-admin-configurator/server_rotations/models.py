@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import F
 
 
 class GameMode(models.Model):
@@ -142,7 +143,7 @@ class RotationLayersPack(models.Model):
     )
 
     class Meta:
-        ordering = ["queue_number"]
+        ordering = [F("queue_number").asc(nulls_first=True), "start_date"]
         constraints = [
             models.UniqueConstraint(
                 fields=["rotation", "start_date"],

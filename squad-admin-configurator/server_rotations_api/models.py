@@ -3,7 +3,7 @@ from datetime import timedelta
 from base import DistributionModel
 from django.conf import settings
 from django.db import models
-from django.db.models import Q
+from django.db.models import F, Q
 from django.utils import timezone
 from server_rotations.models import Rotation, RotationLayersPack
 
@@ -59,7 +59,10 @@ class RotationDistribution(DistributionModel):
         pack_m2m = (
             RotationLayersPack.objects.select_related("pack")
             .prefetch_related("pack__layers_through__layer")
-            .order_by("-start_date", "queue_number")
+            .order_by(
+                "-start_date",
+                F("queue_number").asc(nulls_first=True),
+            )
             .filter(
                 Q(queue_number=self.last_queue_number)
                 | Q(start_date=timezone.now().date()),
