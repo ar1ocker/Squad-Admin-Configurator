@@ -14,11 +14,10 @@ BASE_URL = ""
 # Секретный ключ в django, ставьте длинным, рандомным и не теряйте
 SECRET_KEY = ""
 # Вывод дебаг информации при ошибках
-DEBUG = false
-# Включить ли встроенную Sqlite или использовать Postgresql,
-# если false - необходимо задать переменные окружения
+# Также начинает использоваться Sqlite, при false Postgresql,
+# для него необходимо задать переменные окружения
 # POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD, DB_HOST, DB_PORT
-BUILT_IN_DATABASE = false
+DEBUG = false
 ALLOWED_HOSTS = ['*']
 
 [DISCORD]
