@@ -158,8 +158,10 @@ class RotationLayersPack(models.Model):
     def __str__(self) -> str:
         if self.queue_number is not None:
             return f"#{self.queue_number}"
-        else:
+        elif self.start_date is not None:
             return str(self.start_date.strftime(settings.TIME_FORMAT))
+        else:
+            return "Пак с картами"
 
     def clean(self):
         if self.start_date is None and self.queue_number is None:
