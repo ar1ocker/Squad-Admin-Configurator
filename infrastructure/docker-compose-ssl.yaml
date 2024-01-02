@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15.4-bookworm
+    volumes:
+      - postgres_value:/var/lib/postgresql/data/
+    env_file:
+      - ./.env
+  squad-admin-configurator:
+    build: ../squad-admin-configurator
+    restart: always
+    volumes:
+      - static_value:/squad-admin-configurator/static
+      - ~/squad_admins_configs:/squad-admin-configurator/admins_configs
+      - ~/squad_rotations_configs:/squad-admin-configurator/rotations_configs
+    depends_on:
+      - db
+    env_file:
+      - ./.env
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "1002:443"
+    volumes:
+      - ./nginx/nginx-ssl.conf:/etc/nginx/conf.d/default.conf
+      - ./ssl/chain.pem:/etc/ssl/chain.pem
+      - ./ssl/fullchain.pem:/etc/ssl/fullchain.pem
+      - ./ssl/privkey.pem:/etc/ssl/privkey.pem
+      - static_value:/var/html/static
+    depends_on:
+      - squad-admin-configurator
+
+volumes:
+  postgres_value:
+  static_value:

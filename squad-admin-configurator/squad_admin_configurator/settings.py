@@ -15,6 +15,8 @@ DEBUG = CONFIG["DJANGO"]["DEBUG"]
 
 ALLOWED_HOSTS = CONFIG["DJANGO"]["ALLOWED_HOSTS"]
 
+CSRF_TRUSTED_ORIGINS = CONFIG["DJANGO"]["CSRF_TRUSTED_ORIGINS"]
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",

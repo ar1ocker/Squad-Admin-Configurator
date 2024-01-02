@@ -18,7 +18,10 @@ SECRET_KEY = ""
 # для него необходимо задать переменные окружения
 # POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD, DB_HOST, DB_PORT
 DEBUG = false
-ALLOWED_HOSTS = ['*']
+# IP или домен под которым будет работать ваш сайт, без порта и протокола
+ALLOWED_HOSTS = ['example.com']
+# Источники запросов, которые будет проверять сайт, с портом и протоколом
+CSRF_TRUSTED_ORIGINS = ['http://example.com:1002/', 'https://example.com:1002/']
 
 [DISCORD]
 # Отправлять ли истекшие привилегии в дискорд
