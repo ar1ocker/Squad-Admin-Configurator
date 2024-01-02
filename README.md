@@ -50,6 +50,7 @@
 ```
 # docker exec -it infrastructure-squad-admin-configurator-1 python3 manage.py createsuperuser
 ```
+Для некоторых старых версий Docker - названии контейнера может быть таким **infrastructure_squad-admin-configurator_1**
 
 - При необходимости - импортируем уже существующий файл Admins.cfg с нашего сервера Squad
 ```
