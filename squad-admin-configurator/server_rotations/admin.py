@@ -32,6 +32,7 @@ class RotationLayersPackFormset(BaseInlineFormSet):
             error = True
             error_message = e.message_dict
 
+        # Валидные формы которые не будут удаляться
         valid_forms = [
             form
             for form in self.forms
