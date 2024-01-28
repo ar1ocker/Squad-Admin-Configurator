@@ -41,7 +41,7 @@
 
 Из папки **infrastructure/**
 
-- Поднимаем 3 контейнера: Postgresql, Nginx и Squad-Admin-Configurator. Также будут автоматически выполнены миграции. Сервис будет доступен по адресу **<ваш ip>:1002/admin/**
+- Поднимаем 3 контейнера: Postgresql, Nginx и Squad-Admin-Configurator. Также будут автоматически выполнены миграции. Сервис будет доступен по адресу **<ваш ip>/admin/**
 ```
 # docker compose up -d
 ```
