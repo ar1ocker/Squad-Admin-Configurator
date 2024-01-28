@@ -1,0 +1,19 @@
+{
+    "configurations": [
+        {
+           "name": "Attach to Squad-Admin-Configurator",
+           "type": "python",
+           "request": "attach",
+           "port": 5678,
+           "host": "localhost",
+           "pathMappings": [
+               {
+                   "localRoot": "${workspaceFolder}/squad-admin-configurator",
+                   "remoteRoot": "/app"
+               }
+           ],
+           "django": true,
+           "justMyCode": true
+       }
+    ]
+}

@@ -1,13 +1,9 @@
 #!/bin/sh
-echo Collect static files
-python3 manage.py collectstatic --noinput
-
 echo Wait 5 seconds for database initialization
 sleep 5
 
 echo Start migrations
-python3 manage.py makemigrations --noinput
-python3 manage.py migrate
+python3 manage.py migrate --noinput
 
 echo Run application
 gunicorn "squad_admin_configurator.wsgi:application" --bind 0:8000 &

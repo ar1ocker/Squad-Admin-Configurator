@@ -1,5 +1,6 @@
 config.toml
 rotations/
+static/
 
 .vscode/
 # Byte-compiled / optimized / DLL files
@@ -125,6 +126,7 @@ celerybeat.pid
 
 # Environments
 .env
+.env-dev
 .venv
 env/
 venv/
