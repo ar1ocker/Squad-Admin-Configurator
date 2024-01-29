@@ -1,6 +1,8 @@
 config.toml
 rotations/
 static/
+admins_configs/
+rotations_configs/
 
 .vscode/
 # Byte-compiled / optimized / DLL files
