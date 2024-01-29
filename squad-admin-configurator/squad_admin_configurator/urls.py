@@ -7,10 +7,10 @@ admin.site.index_title = settings.ADMIN_INDEX_TITLE
 admin.site.site_header = settings.ADMIN_SITE_HEADER
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
-    path("api/privileged/", include("api.urls", namespace="api")),
+    path("v1/api/privileged/", include("api.urls", namespace="api")),
     path(
-        "api/rotations/",
+        "v1/api/rotations/",
         include("server_rotations_api.urls", namespace="rotations_api"),
     ),
+    path("", admin.site.urls),
 ]
