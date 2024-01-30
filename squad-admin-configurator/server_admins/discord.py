@@ -9,7 +9,7 @@ def send_messages_to_discord(webhook, username, messages=None):
     if isinstance(messages, str):
         messages = [messages]
     elif not isinstance(messages, Sequence):
-        raise ValueError('message must be a sequence')
+        raise ValueError("message must be a sequence")
 
     webhook = DiscordWebhook(
         url=webhook, username=username, rate_limit_retry=True
