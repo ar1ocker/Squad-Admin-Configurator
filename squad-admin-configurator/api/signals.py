@@ -16,8 +16,10 @@ def remove_when_distribution_changed(sender, instance, **kwargs):
     """
     server = instance
 
-    if (server.type_of_distribution not in
-            Server.TYPES_OF_DISTRIBUTION_WITH_API):
+    if (
+        server.type_of_distribution
+        not in Server.TYPES_OF_DISTRIBUTION_WITH_API
+    ):
         try:
             ServerUrl.objects.get(server=server).delete()
         except ServerUrl.DoesNotExist:
