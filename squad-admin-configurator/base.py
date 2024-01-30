@@ -23,6 +23,11 @@ def url_postfix_validator(value):
 
 
 class DistributionModel(models.Model):
+    """
+    Абстрактная моделька для распространения файлов по api или через
+    локальный файл
+    """
+
     LOCAL = "LOCAL"
     API = "API"
     API_AND_LOCAL = "API_LOCAL"
