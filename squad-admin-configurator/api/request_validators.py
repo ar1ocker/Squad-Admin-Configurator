@@ -18,7 +18,7 @@ def get_signature_from_header(header, pattern):
     return match_header.group(0) if match_header else None
 
 
-def generate_signarute_from_request(request, webhook_object):
+def generate_signature_from_request(request, webhook_object):
     """
     Генерация сигнатуры из реквеста, секретного ключа и типа хеша,
     для некоторых сервисов алгоритмы генерации HMAC слегка отличаются
@@ -82,7 +82,7 @@ def validate_hmac_in_request(request, webhook_object):
     if request_hmac_signature is None:
         raise ValidationError("HMAC signature in header not found")
 
-    generated_hmac_signature = generate_signarute_from_request(
+    generated_hmac_signature = generate_signature_from_request(
         request, webhook_object
     )
 
