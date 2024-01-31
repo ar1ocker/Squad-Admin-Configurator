@@ -20,7 +20,9 @@ def send_messages_to_discord(webhook, username, messages=None):
         last_error = None
         for _ in range(3):
             try:
-                webhook.execute()
+                discord_webhook.execute()
+                last_error = None
+                last_error = None
             except Timeout as e:
                 logging.warning(
                     f'Timeout when send message "{text}" to discord'
