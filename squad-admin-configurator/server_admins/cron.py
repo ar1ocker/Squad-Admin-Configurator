@@ -14,7 +14,7 @@ class CreateAdminsConfig(CronJobBase):
     schedule = Schedule(run_every_mins=2)
     code = "Обновление локальных файлов администраторов"
 
-    def do(self):
+    def do(self) -> None:
         create_local_configs()
 
 
@@ -22,7 +22,7 @@ class DisablingServerPrivilegedByEndTime(CronJobBase):
     schedule = Schedule(run_every_mins=2)
     code = "Изменение поля is_active у пользователя"
 
-    def do(self):
+    def do(self) -> None:
         server_privileges = (
             ServerPrivileged.objects.filter(
                 date_of_end__lt=timezone.now(), is_active=True
@@ -39,13 +39,13 @@ class DisablingServerPrivilegedByEndTime(CronJobBase):
         if server_privileges.count() > 0:
             self.send_info(server_privileges)
 
-    def send_info(self, server_privileges):
+    def send_info(self, server_privileges) -> None:
         if not EXPIRED_PRIVILEGED_CHAT["ENABLE"]:
             return
 
-        messages = []
+        messages: list[str] = []
         for server_priv in server_privileges:
-            roles_text = ", ".join(
+            roles_text: str = ", ".join(
                 [role.title for role in server_priv.roles.all()]
             )
 

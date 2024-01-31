@@ -12,16 +12,16 @@ from server_admins.models import (
 )
 
 
-def yes_or_no(text):
+def yes_or_no(text) -> bool:
     while True:
-        answer = input(text + " (y/n): ").strip()
+        answer: str = input(text + " (y/n): ").strip()
         if answer in ["y", "n"]:
             return True if answer == "y" else False
 
 
-def question_with_confirmation(text):
+def question_with_confirmation(text) -> str:
     while True:
-        answer = input(text + ": ").strip()
+        answer: str = input(text + ": ").strip()
 
         if answer == "":
             continue
@@ -113,13 +113,13 @@ class Command(BaseCommand):
 
         return priv
 
-    def get_db_roles(self, roles):
+    def get_db_roles(self, roles) -> dict:
         """
         Возвращает связь названия ролей и фактических записей в БД
         """
-        return_roles = {}
+        return_roles: dict[str, Role] = {}
         for config_role in roles:
-            role = self.create_new_role_or_get_old(
+            role: Role = self.create_new_role_or_get_old(
                 config_role["title"],
                 [
                     perm.strip()
@@ -131,9 +131,9 @@ class Command(BaseCommand):
 
         return return_roles
 
-    def create_new_role_or_get_old(self, role_name, permissions_names):
+    def create_new_role_or_get_old(self, role_name, permissions_names) -> Role:
         """
-        Создание новой роли или получени уже существующей
+        Создание новой роли или получении уже существующей
         """
         old_role = None
         try:
@@ -161,7 +161,7 @@ class Command(BaseCommand):
         else:
             return self.create_role(permissions_names)
 
-    def create_role(self, permissions_names, role_name=None):
+    def create_role(self, permissions_names, role_name=None) -> Role:
         """
         Создание новой роли
         """
@@ -213,7 +213,7 @@ class Command(BaseCommand):
 
         return roles
 
-    def choose_server(self):
+    def choose_server(self) -> int | None:
         """
         Выбор сервера или создание нового
         """
@@ -254,12 +254,12 @@ class Command(BaseCommand):
 
             return server_id
 
-    def create_server(self):
+    def create_server(self) -> int:
         """
         Создание сервера с указанным именем
         """
-        title = question_with_confirmation("Введите имя нового сервера")
-        server = Server.objects.create(title=title)
+        title: str = question_with_confirmation("Введите имя нового сервера")
+        server: Server = Server.objects.create(title=title)
 
         self.stdout.write(
             f"Создан новый сервер - {server.id} - {server.title}"

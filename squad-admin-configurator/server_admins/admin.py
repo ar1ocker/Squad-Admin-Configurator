@@ -7,7 +7,7 @@ from .utils import date_or_perpetual
 
 def custom_titled_filter(title):
     class Wrapper(admin.FieldListFilter):
-        def __new__(cls, *args, **kwargs):
+        def __new__(cls, *args, **kwargs) -> admin.FieldListFilter:
             instance = admin.FieldListFilter.create(*args, **kwargs)
             instance.title = title
             return instance
@@ -56,7 +56,7 @@ class AdminServer(admin.ModelAdmin):
         description="Обновить конфиг выбранных серверов",
         permissions=["change"],
     )
-    def create_admins_cfg_selected(self, request, queryset):
+    def create_admins_cfg_selected(self, request, queryset) -> None:
         for server in queryset:
             create_local_config(server)
         self.message_user(
@@ -128,7 +128,7 @@ class AdminPrivileged(admin.ModelAdmin):
         self.message_user(request, "Конфиги обновлены", messages.SUCCESS)
 
     @admin.display(description="Роли на всех серверах")
-    def get_roles(self, obj):
+    def get_roles(self, obj) -> str:
         servers_roles = obj.serverprivileged_set.select_related(
             "server"
         ).prefetch_related("roles")

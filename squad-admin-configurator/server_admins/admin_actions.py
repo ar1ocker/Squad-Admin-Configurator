@@ -5,7 +5,7 @@ from .models import Server
 ADMINS_CONFIG_DIR = settings.ADMINS_CONFIG_DIR
 
 
-def create_local_configs():
+def create_local_configs() -> None:
     """
     Генерация локальных конфигов администраторов
     для всех необходимых серверов
@@ -18,7 +18,7 @@ def create_local_configs():
         create_local_config(server)
 
 
-def create_local_config(server):
+def create_local_config(server) -> None:
     """
     Генерация локального конфига администраторов
     для отдельного игрового сервера
