@@ -58,6 +58,7 @@ class ReceivedWebhook(models.Model):
     HMAC_HASHES = hashlib_algorithms
     HMAC_HASHES_CHOICES = sorted(list(zip(HMAC_HASHES, HMAC_HASHES)))
 
+    DEFAULT = "default"
     BATTLEMETRICS = "battlemetrics"
     REQUEST_SENDERS = [
         (DEFAULT, "Стандартный"),
