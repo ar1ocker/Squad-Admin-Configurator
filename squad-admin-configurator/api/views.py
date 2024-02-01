@@ -12,7 +12,6 @@ from rest_framework.views import APIView
 from server_admins.models import Privileged, ServerPrivileged
 
 from .models import RoleWebhook, ServerUrl, WebhookLog
-from .request_validators import validate_hmac_in_request
 from .serializers import RoleWebhookSerializer
 
 
@@ -21,14 +20,14 @@ class RoleWebhookView(APIView):
     Добавление новых ролей пользователям при вызове вебхука
     """
 
-    def post(self, request: Request, url):
-        webhook = get_object_or_404(RoleWebhook, url=url)
+    def post(self, request: Request, url) -> Response:
+        webhook: RoleWebhook = get_object_or_404(RoleWebhook, url=url)
 
         if not webhook.is_active:
             return Response(status=status.HTTP_403_FORBIDDEN)
 
         try:
-            validate_hmac_in_request(request, webhook)
+            webhook.validate_request(request)
         except ValidationError as error:
             webhook.write_log(
                 f"Ошибка валидации HMAC - {error.detail}",

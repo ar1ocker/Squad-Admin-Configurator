@@ -1,14 +1,23 @@
 from datetime import datetime
 from hashlib import algorithms_available as hashlib_algorithms
+from typing import Literal, TypeAlias
 
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.http import HttpRequest
 from ipware import get_client_ip
 from server_admins.models import Role, Server
 
+from .request_validators import (
+    BaseRequestHMACValidator,
+    BattlemetricsRequestHMACValidator,
+    DefaultRequestHMACValidator,
+)
 from .validators import regex_validator, url_postfix_validator
+
+LOG_LEVEL: TypeAlias = Literal["info", "warning", "error"]
 
 
 class WebhookLog(models.Model):
@@ -16,7 +25,7 @@ class WebhookLog(models.Model):
     WARNING = "warning"
     ERROR = "error"
 
-    LOG_LEVELS = [
+    LOG_LEVELS: list[tuple[str, str]] = [
         (INFO, "Информация"),
         (WARNING, "Предупреждение"),
         (ERROR, "Ошибка"),
@@ -42,7 +51,7 @@ class WebhookLog(models.Model):
     object_id = models.PositiveIntegerField("ID вебхука")
     content_object = GenericForeignKey()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.message[:50]
 
     class Meta:
@@ -135,7 +144,7 @@ class ReceivedWebhook(models.Model):
         "Сервис отправляющий запрос",
         max_length=128,
         blank=False,
-        default=REQUEST_SENDERS[DEFAULT],
+        default=DEFAULT,
         choices=REQUEST_SENDERS,
         help_text=(
             "Активирует специфичные для каждого сервиса алгоритмы "
@@ -143,13 +152,13 @@ class ReceivedWebhook(models.Model):
         ),
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.description
 
     class Meta:
         abstract = True
 
-    def clean(self):
+    def clean(self) -> None:
         if self.hmac_is_active:
             checked_fields = {
                 "hmac_hash_type": self.hmac_hash_type,
@@ -169,7 +178,7 @@ class ReceivedWebhook(models.Model):
 
         return super().clean()
 
-    def get_webhook_info(self):
+    def get_webhook_info(self) -> str:
         """
         Возвращает строковое представление полей, используется при
         логировании
@@ -209,8 +218,13 @@ class ReceivedWebhook(models.Model):
 
         return "\n".join(return_info)
 
-    def write_log(self, message, log_level, request=None):
-        request_info = ""
+    def write_log(
+        self,
+        message: str,
+        log_level: LOG_LEVEL,
+        request=None,
+    ) -> None:
+        request_info: str = ""
         if request is not None:
             ip, _ = get_client_ip(request)
             request_info = (
@@ -224,6 +238,16 @@ class ReceivedWebhook(models.Model):
             webhook_info=self.get_webhook_info(),
             request_info=request_info,
         )
+
+    def validate_request(
+        self, request: HttpRequest, raise_validation_error=True
+    ) -> bool:
+        if self.hmac_is_active:
+            return self.SENDER_HMAC_VALIDATORS[self.request_sender](
+                request=request, webhook_object=self
+            ).is_valid(raise_validation_error=raise_validation_error)
+
+        return True
 
 
 class ServerUrl(models.Model):
