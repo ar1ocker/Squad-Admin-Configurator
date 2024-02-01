@@ -59,7 +59,15 @@ class ReceivedWebhook(models.Model):
     HMAC_HASHES_CHOICES = sorted(list(zip(HMAC_HASHES, HMAC_HASHES)))
 
     BATTLEMETRICS = "battlemetrics"
-    REQUEST_SENDERS = [(BATTLEMETRICS, "Battlemetrics.com")]
+    REQUEST_SENDERS = [
+        (DEFAULT, "Стандартный"),
+        (BATTLEMETRICS, "Battlemetrics.com"),
+    ]
+
+    SENDER_HMAC_VALIDATORS: dict[str, BaseRequestHMACValidator] = {
+        BATTLEMETRICS: BattlemetricsRequestHMACValidator,
+        DEFAULT: DefaultRequestHMACValidator,
+    }
 
     description = models.CharField("Описание", max_length=300)
     is_active = models.BooleanField("Активирован")
@@ -125,7 +133,8 @@ class ReceivedWebhook(models.Model):
     request_sender = models.CharField(
         "Сервис отправляющий запрос",
         max_length=128,
-        blank=True,
+        blank=False,
+        default=REQUEST_SENDERS[DEFAULT],
         choices=REQUEST_SENDERS,
         help_text=(
             "Активирует специфичные для каждого сервиса алгоритмы "
