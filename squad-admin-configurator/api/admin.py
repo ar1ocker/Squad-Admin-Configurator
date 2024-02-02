@@ -1,10 +1,8 @@
 from django.contrib import admin
 from django.contrib.admin.filters import AllValuesFieldListFilter
-from django.db.models import Q
 from django.urls import reverse
 from django.utils.html import format_html
-from server_admins.models import Server
-from utils import reverse_to_admin_edit
+from utils import reverse_to_admin_edit, textarea_form
 
 from .models import AdminsConfigDistribution, RoleWebhook, WebhookLog
 
@@ -121,24 +119,28 @@ class RoleWebhookAdmin(admin.ModelAdmin):
 
 @admin.register(AdminsConfigDistribution)
 class AdminsConfigAdmin(admin.ModelAdmin):
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        """
-        Убираем из выбора серверов не подходящие или уже использованные
-        варианты
-        """
-        if db_field.name == "server":
-            server_url_id = request.resolver_match.kwargs.get("object_id")
-            its_our_server = Q(server_url=server_url_id)
-            with_api_and_not_tied = Q(
-                type_of_distribution__in=Server.TYPES_OF_DISTRIBUTION_WITH_API
-            ) & Q(  # noqa: E501
-                server_url=None
-            )
-
-            kwargs["queryset"] = Server.objects.filter(
-                its_our_server | with_api_and_not_tied
-            )
-        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+    form = textarea_form(AdminsConfigDistribution, ["description"])
+    fields = [
+        "is_active",
+        "title",
+        "server",
+        "description",
+        "type_of_distribution",
+        "local_filename",
+        "url",
+    ]
+    list_display = [
+        "is_active",
+        "title",
+        "type_of_distribution",
+        "local_filename",
+        "url",
+    ]
+    list_editable = ["is_active"]
+    list_display_links = ["title"]
+    list_filter = ["is_active", "type_of_distribution"]
+    search_fields = ["title", "description"]
+    autocomplete_fields = ["server"]
 
     def save_model(self, request, obj, form, change):
         """Отправка сообщений с текущим полным url к конфигурации"""
@@ -151,8 +153,3 @@ class AdminsConfigAdmin(admin.ModelAdmin):
                 ),
             )
         return super().save_model(request, obj, form, change)
-
-    fields = ("is_active", "server", "url")
-    list_display = ("server", "is_active", "url")
-    list_editable = ("is_active",)
-    list_filter = ("is_active",)

@@ -1,5 +1,4 @@
 from datetime import datetime
-from hashlib import algorithms_available as hashlib_algorithms
 from typing import Literal, TypeAlias
 
 from base import DistributionModel
@@ -283,12 +282,13 @@ class AdminsConfigDistribution(DistributionModel):
         related_name="server_url",
     )
 
-    def __str__(self):
-        return self.server.title
-
     class Meta:
-        verbose_name = "Доступ к конфигурации игрового сервера"
-        verbose_name_plural = "2. Доступ к конфигурации игрового сервера"
+        verbose_name = (
+            "Доступ к файлу конфигурации привилегированных пользователей"
+        )
+        verbose_name_plural = (
+            "2. Доступ к файлу конфигурации привилегированных пользователей"
+        )
 
 
 class RoleWebhook(ReceivedWebhook):

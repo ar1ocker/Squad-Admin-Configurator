@@ -44,7 +44,7 @@ class DistributionModel(models.Model):
 
     is_active = models.BooleanField("Активирован", default=True)
 
-    title = models.CharField("Название", max_length=50, unique=True)
+    title = models.CharField("Название", max_length=50)
 
     description = models.CharField("Описание", max_length=300, blank=True)
 
