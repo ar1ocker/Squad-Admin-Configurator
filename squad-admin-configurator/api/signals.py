@@ -1,7 +1,7 @@
 from django.db.models.signals import post_save
 from server_admins.models import Server
 
-from .models import ServerUrl
+from .models import AdminsConfigDistribution
 
 
 def connect_signals():
@@ -21,6 +21,6 @@ def remove_when_distribution_changed(sender, instance, **kwargs):
         not in Server.TYPES_OF_DISTRIBUTION_WITH_API
     ):
         try:
-            ServerUrl.objects.get(server=server).delete()
-        except ServerUrl.DoesNotExist:
+            AdminsConfigDistribution.objects.get(server=server).delete()
+        except AdminsConfigDistribution.DoesNotExist:
             pass

@@ -2,6 +2,7 @@ from datetime import datetime
 from hashlib import algorithms_available as hashlib_algorithms
 from typing import Literal, TypeAlias
 
+from base import DistributionModel
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
@@ -64,8 +65,26 @@ class WebhookLog(models.Model):
 
 
 class ReceivedWebhook(models.Model):
-    HMAC_HASHES = hashlib_algorithms
-    HMAC_HASHES_CHOICES = sorted(list(zip(HMAC_HASHES, HMAC_HASHES)))
+    HMAC_HASHES_CHOICES = (
+        ("blake2b", "blake2b"),
+        ("blake2s", "blake2s"),
+        ("md5", "md5"),
+        ("md5-sha1", "md5-sha1"),
+        ("sha1", "sha1"),
+        ("sha224", "sha224"),
+        ("sha256", "sha256"),
+        ("sha384", "sha384"),
+        ("sha3_224", "sha3_224"),
+        ("sha3_256", "sha3_256"),
+        ("sha3_384", "sha3_384"),
+        ("sha3_512", "sha3_512"),
+        ("sha512", "sha512"),
+        ("sha512_224", "sha512_224"),
+        ("sha512_256", "sha512_256"),
+        ("shake_128", "shake_128"),
+        ("shake_256", "shake_256"),
+        ("sm3", "sm3"),
+    )
 
     DEFAULT = "default"
     BATTLEMETRICS = "battlemetrics"
@@ -250,7 +269,7 @@ class ReceivedWebhook(models.Model):
         return True
 
 
-class ServerUrl(models.Model):
+class AdminsConfigDistribution(DistributionModel):
     """
     Модель предназначена для хранения url и управления доступностью
     получения конфигурации админов игрового сервера через API
@@ -262,13 +281,6 @@ class ServerUrl(models.Model):
         primary_key=True,
         verbose_name="Сервер",
         related_name="server_url",
-    )
-    is_active = models.BooleanField("Активирована ли раздача файла")
-    url = models.CharField(
-        "URL постфикс пути",
-        max_length=100,
-        unique=True,
-        validators=(url_postfix_validator,),
     )
 
     def __str__(self):

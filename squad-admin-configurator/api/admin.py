@@ -6,7 +6,7 @@ from django.utils.html import format_html
 from server_admins.models import Server
 from utils import reverse_to_admin_edit
 
-from .models import RoleWebhook, ServerUrl, WebhookLog
+from .models import AdminsConfigDistribution, RoleWebhook, WebhookLog
 
 
 @admin.register(WebhookLog)
@@ -119,8 +119,8 @@ class RoleWebhookAdmin(admin.ModelAdmin):
         return super().save_model(request, obj, form, change)
 
 
-@admin.register(ServerUrl)
-class ServerUrlAdmin(admin.ModelAdmin):
+@admin.register(AdminsConfigDistribution)
+class AdminsConfigAdmin(admin.ModelAdmin):
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         """
         Убираем из выбора серверов не подходящие или уже использованные

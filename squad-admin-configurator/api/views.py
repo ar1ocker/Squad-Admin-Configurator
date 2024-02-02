@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from server_admins.models import Privileged, ServerPrivileged
 
-from .models import RoleWebhook, ServerUrl, WebhookLog
+from .models import AdminsConfigDistribution, RoleWebhook, WebhookLog
 from .serializers import RoleWebhookSerializer
 
 
@@ -62,13 +62,11 @@ class RoleWebhookView(APIView):
         with transaction.atomic():
             priv, created = Privileged.objects.get_or_create(
                 steam_id=serializer.validated_data["steam_id"],
-                defaults=(
-                    {
-                        "name": serializer.validated_data["name"],
-                        "description": serializer.validated_data["comment"],
-                        "date_of_end": date_of_end,
-                    }
-                ),
+                defaults=({
+                    "name": serializer.validated_data["name"],
+                    "description": serializer.validated_data["comment"],
+                    "date_of_end": date_of_end,
+                }),
             )
 
             if not created and webhook.active_and_increase_common_date_of_end:
@@ -116,7 +114,7 @@ class ServerConfigView(APIView):
 
     def get(self, request, url):
         server_url = get_object_or_404(
-            ServerUrl.objects.select_related("server"), url=url
+            AdminsConfigDistribution.objects.select_related("server"), url=url
         )
         if server_url.is_active:
             return HttpResponse(
