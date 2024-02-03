@@ -15,8 +15,6 @@ services:
     volumes:
       - ../squad-admin-configurator:/app
       - static_value:/app/static
-      - ~/squad_admins_configs:/app/admins_configs
-      - ~/squad_rotations_configs:/app/rotations_configs
     depends_on:
       - db
     env_file:
