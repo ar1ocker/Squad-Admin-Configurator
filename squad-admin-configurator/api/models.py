@@ -9,13 +9,13 @@ from django.db import models
 from django.http import HttpRequest
 from ipware import get_client_ip
 from server_admins.models import Role, Server
+from utils import regex_validator, url_postfix_validator
 
 from .request_validators import (
     BaseRequestHMACValidator,
     BattlemetricsRequestHMACValidator,
     DefaultRequestHMACValidator,
 )
-from .validators import regex_validator, url_postfix_validator
 
 LOG_LEVEL: TypeAlias = Literal["info", "warning", "error"]
 
