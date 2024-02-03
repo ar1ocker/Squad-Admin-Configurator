@@ -138,7 +138,7 @@ ADMINS_CONFIG_DIR = BASE_DIR / CONFIG["ADMINS"]["ADMINS_CONFIG_DIR"]
 ROTATIONS_CONFIG_DIR = BASE_DIR / CONFIG["ROTATIONS"]["ROTATIONS_CONFIG_DIR"]
 
 CRON_CLASSES = [
-    "server_admins.cron.CreateAdminsConfig",
+    "api.cron.CreateAdminsConfig",
     "server_admins.cron.DisablingPrivilegedByEndTime",
     "server_admins.cron.DisablingServerPrivilegedByEndTime",
     "server_rotations_api.cron.CreateRotationsFiles",

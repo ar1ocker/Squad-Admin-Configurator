@@ -1,21 +1,12 @@
+from discord_message import send_messages_to_discord
 from django.conf import settings
 from django.utils import timezone
 from django_cron import CronJobBase, Schedule
 from utils import reverse_to_admin_edit
 
-from .admin_actions import create_local_configs
-from .discord import send_messages_to_discord
 from .models import Privileged, ServerPrivileged
 
 EXPIRED_PRIVILEGED_CHAT = settings.DISCORD["EXPIRED_PRIVILEGED_CHAT"]
-
-
-class CreateAdminsConfig(CronJobBase):
-    schedule = Schedule(run_every_mins=2)
-    code = "Обновление локальных файлов администраторов"
-
-    def do(self) -> None:
-        create_local_configs()
 
 
 class DisablingServerPrivilegedByEndTime(CronJobBase):
@@ -104,8 +95,7 @@ class DisablingPrivilegedByEndTime(CronJobBase):
             messages.append(
                 f"{settings.BASE_URL}{reverse_to_admin_edit(priv)}\n"
                 f"{priv.name} - {priv.steam_id}\n"
-                "Истекли все полномочия:\n"
-                + " ".join(all_roles_text)
+                "Истекли все полномочия:\n" + " ".join(all_roles_text)
             )
 
         send_messages_to_discord(

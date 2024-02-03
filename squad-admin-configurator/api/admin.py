@@ -4,6 +4,7 @@ from django.urls import reverse
 from django.utils.html import format_html
 from utils import reverse_to_admin_edit, textarea_form
 
+from .admin_actions import create_local_config
 from .models import AdminsConfigDistribution, RoleWebhook, WebhookLog
 
 
@@ -141,10 +142,15 @@ class AdminsConfigAdmin(admin.ModelAdmin):
     list_filter = ["is_active", "type_of_distribution"]
     search_fields = ["title", "description"]
     autocomplete_fields = ["server"]
+    actions = ["update_config"]
 
     def save_model(self, request, obj, form, change):
         """Отправка сообщений с текущим полным url к конфигурации"""
-        if obj.is_active:
+        if (
+            obj.is_active
+            and obj.type_of_distribution
+            in AdminsConfigDistribution.TYPES_OF_DISTRIBUTION_WITH_API
+        ):
             self.message_user(
                 request,
                 "Путь к файлу "
@@ -153,3 +159,9 @@ class AdminsConfigAdmin(admin.ModelAdmin):
                 ),
             )
         return super().save_model(request, obj, form, change)
+
+    @admin.action(description="Обновление локального конфига")
+    def update_config(self, request, queryset):
+        for obj in queryset:
+            create_local_config(obj)
+        self.message_user(request, "Обновили выбранные конфиги")

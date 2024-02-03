@@ -3,6 +3,7 @@ rotations/
 static/
 admins_configs/
 rotations_configs/
+.VSCodeCounter/
 
 .vscode/
 # Byte-compiled / optimized / DLL files

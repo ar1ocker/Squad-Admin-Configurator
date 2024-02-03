@@ -1,12 +1,9 @@
 import re
 
 from django.conf import settings
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
 from django.utils import timezone
-
-from .validators import admins_filename_validator
 
 
 class Server(models.Model):
@@ -14,36 +11,11 @@ class Server(models.Model):
     Модель хранения отдельного сервера, вариантом выбора раздачи этого файла
     """
 
-    LOCAL = "LOCAL"
-    API = "API"
-    API_AND_LOCAL = "API_LOCAL"
-
-    TYPES_OF_DISTRIBUTION: list = [
-        (LOCAL, "Локальный файл"),
-        (API, "Через API"),
-        (API_AND_LOCAL, "Локальный файл и API"),
-    ]
-
-    TYPES_OF_DISTRIBUTION_WITH_API: list[str] = [API, API_AND_LOCAL]
-
-    TYPES_OF_DISTRIBUTION_WITH_LOCAL: list[str] = [LOCAL, API_AND_LOCAL]
-
     is_active = models.BooleanField("Активирован", default=True)
 
-    title = models.CharField("Название", max_length=50, unique=True)
+    title = models.CharField("Название", max_length=50)
 
     description = models.CharField("Описание", max_length=300, blank=True)
-
-    type_of_distribution = models.CharField(
-        "Вариант распространения конфигурации",
-        choices=TYPES_OF_DISTRIBUTION,
-        max_length=10,
-        default=API,
-    )
-
-    local_filename = models.CharField(
-        "Название локального файла", max_length=100, blank=True
-    )
 
     def __str__(self) -> str:
         return self.title
@@ -52,23 +24,6 @@ class Server(models.Model):
         verbose_name = "Сервер"
         verbose_name_plural = "1. Сервера"
         ordering = ["-title"]
-
-    def clean(self) -> None:
-        self.title = re.sub(r"\s", " ", self.title)
-
-        if self.type_of_distribution in self.TYPES_OF_DISTRIBUTION_WITH_LOCAL:
-            admins_filename_validator(self.local_filename, "local_filename")
-
-            if (
-                Server.objects.filter(local_filename=self.local_filename)
-                .exclude(pk=self.pk)
-                .exists()
-            ):
-                raise ValidationError(
-                    {"local_filename": "Должен быть уникальным"}
-                )
-        else:
-            self.local_filename = ""
 
     def get_config(self) -> str:
         time_format: str = settings.TIME_FORMAT

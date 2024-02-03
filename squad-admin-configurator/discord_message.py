@@ -41,4 +41,6 @@ def send_messages_to_discord(
             break
 
         if last_error is not None:
-            raise last_error
+            logging.error(
+                "Ошибка при отправке сообщения в дискорд", exc_info=last_error
+            )

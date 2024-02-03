@@ -26,7 +26,7 @@ CSRF_TRUSTED_ORIGINS = ['http://example.com:1002/', 'https://example.com:1002/']
 [DISCORD]
 # Отправлять ли истекшие привилегии в дискорд
 [DISCORD.EXPIRED_PRIVILEGED_CHAT]
-ENABLE = true
+ENABLE = false
 # Вебхук чата, в который будут отправлены истекшие админки
 CHAT_WEBHOOK = ''
 

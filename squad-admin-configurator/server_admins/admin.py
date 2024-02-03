@@ -1,6 +1,5 @@
-from django.contrib import admin, messages
+from django.contrib import admin
 
-from .admin_actions import create_local_config, create_local_configs
 from .models import Permission, Privileged, Role, Server, ServerPrivileged
 from .utils import date_or_perpetual
 
@@ -35,8 +34,6 @@ class AdminServer(admin.ModelAdmin):
         "title",
         "description",
         "is_active",
-        "type_of_distribution",
-        "local_filename",
     )
     list_editable = ("is_active",)
     search_fields = (
@@ -44,24 +41,7 @@ class AdminServer(admin.ModelAdmin):
         "description",
     )
     ordering = ("-title",)
-    list_filter = ("is_active", "type_of_distribution")
-    actions = ("create_admins_cfg", "create_admins_cfg_selected")
-
-    @admin.action(description="Обновить все конфиги", permissions=["change"])
-    def create_admins_cfg(self, request, queryset):
-        create_local_configs()
-        self.message_user(request, "Конфиги обновлены", messages.SUCCESS)
-
-    @admin.action(
-        description="Обновить конфиг выбранных серверов",
-        permissions=["change"],
-    )
-    def create_admins_cfg_selected(self, request, queryset) -> None:
-        for server in queryset:
-            create_local_config(server)
-        self.message_user(
-            request, "Выбранные сервера обновлены", messages.SUCCESS
-        )
+    list_filter = ("is_active",)
 
 
 @admin.register(Role)
@@ -112,7 +92,6 @@ class AdminPrivileged(admin.ModelAdmin):
     )
     ordering = ("-creation_date",)
     search_fields = ("name", "steam_id", "description")
-    actions = ("create_admins_cfg",)
 
     @admin.display(
         ordering="-date_of_end",
@@ -121,11 +100,6 @@ class AdminPrivileged(admin.ModelAdmin):
     )
     def date_of_end_view(self, obj):
         return obj.date_of_end
-
-    @admin.action(description="Обновить все конфиги", permissions=["change"])
-    def create_admins_cfg(self, request, queryset):
-        create_local_configs()
-        self.message_user(request, "Конфиги обновлены", messages.SUCCESS)
 
     @admin.display(description="Роли на всех серверах")
     def get_roles(self, obj) -> str:

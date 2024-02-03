@@ -283,12 +283,8 @@ class AdminsConfigDistribution(DistributionModel):
     )
 
     class Meta:
-        verbose_name = (
-            "Доступ к файлу конфигурации привилегированных пользователей"
-        )
-        verbose_name_plural = (
-            "2. Доступ к файлу конфигурации привилегированных пользователей"
-        )
+        verbose_name = "Доступ к файлу конфигурации"
+        verbose_name_plural = "2. Доступ к файлу конфигурации"
 
 
 class RoleWebhook(ReceivedWebhook):
