@@ -61,7 +61,7 @@ class DistributionModel(models.Model):
             models.UniqueConstraint(
                 fields=["local_filename"],
                 condition=Q(local_filename__isnull=False),
-                name="distribution_local_filename_unique",
+                name="%(app_label)s_%(class)s_distribution_local_filename_unique",
                 violation_error_message=(
                     "Название локального файла должно быть уникальным"
                 ),
@@ -69,7 +69,7 @@ class DistributionModel(models.Model):
             models.UniqueConstraint(
                 fields=["url"],
                 condition=Q(url__isnull=False),
-                name="distribution_url_unique",
+                name="%(app_label)s_%(class)s_distribution_url_unique",
                 violation_error_message="Постфикс url должен быть уникальным",
             ),
         ]

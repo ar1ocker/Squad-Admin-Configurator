@@ -12,8 +12,9 @@ def create_local_configs() -> None:
         type_of_distribution__in=AdminsConfigDistribution.TYPES_OF_DISTRIBUTION_WITH_LOCAL  # noqa: E501
     )
 
-    for distrib in distributions:
-        create_local_config(distrib)
+    for distribution in distributions:
+        if distribution.is_active:
+            create_local_config(distribution)
 
 
 def create_local_config(distrib: AdminsConfigDistribution) -> None:

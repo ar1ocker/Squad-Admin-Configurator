@@ -1,4 +1,4 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.contrib.admin.filters import AllValuesFieldListFilter
 from django.urls import reverse
 from django.utils.html import format_html
@@ -161,7 +161,19 @@ class AdminsConfigAdmin(admin.ModelAdmin):
         return super().save_model(request, obj, form, change)
 
     @admin.action(description="Обновление локального конфига")
-    def update_config(self, request, queryset):
+    def update_config(self, request, queryset) -> None:
+        updated_config_exist = False
+
         for obj in queryset:
-            create_local_config(obj)
-        self.message_user(request, "Обновили выбранные конфиги")
+            if obj.is_active:
+                create_local_config(obj)
+                updated_config_exist = True
+            else:
+                self.message_user(
+                    request,
+                    f"{obj} отключен, конфиг не обновлен",
+                    level=messages.WARNING,
+                )
+
+        if updated_config_exist:
+            self.message_user(request, "Обновили выбранные конфиги")

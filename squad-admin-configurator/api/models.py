@@ -274,14 +274,14 @@ class AdminsConfigDistribution(DistributionModel):
     получения конфигурации админов игрового сервера через API
     """
 
-    server = models.OneToOneField(
+    server = models.ForeignKey(
         Server,
         on_delete=models.CASCADE,
         verbose_name="Сервер",
         related_name="server_url",
     )
 
-    class Meta:
+    class Meta(DistributionModel.Meta):
         verbose_name = "Доступ к файлу конфигурации"
         verbose_name_plural = "2. Доступ к файлу конфигурации"
 
