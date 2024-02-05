@@ -114,7 +114,8 @@ class ServerConfigView(APIView):
 
     def get(self, request, url):
         server_url = get_object_or_404(
-            AdminsConfigDistribution.objects.select_related("server"), url=url
+            AdminsConfigDistribution.objects.select_related("server"),
+            url=url,
         )
         if server_url.is_active:
             return HttpResponse(

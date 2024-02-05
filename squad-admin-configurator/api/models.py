@@ -277,7 +277,6 @@ class AdminsConfigDistribution(DistributionModel):
     server = models.OneToOneField(
         Server,
         on_delete=models.CASCADE,
-        primary_key=True,
         verbose_name="Сервер",
         related_name="server_url",
     )
