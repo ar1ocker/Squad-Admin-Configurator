@@ -52,7 +52,9 @@ class LayerSpec(Enum):
             match node.kind:
                 case LayerSpec.NEWLINE.name:
                     current_line += 1
-                case LayerSpec.MISMATCH.name | LayerSpec.MISMATCH_SPELLING.name:
+                case (
+                    LayerSpec.MISMATCH.name | LayerSpec.MISMATCH_SPELLING.name
+                ):
                     errors.append(
                         error_description(node.kind, current_line, node.value)
                     )

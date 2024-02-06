@@ -1,28 +1,15 @@
-import re
-
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
-
-
-def filename_validator(value):
-    if value is not None and not re.fullmatch(
-        r"^(?!.*[_-][_-])[A-Za-z0-9_]+$", value
-    ):
-        raise ValidationError(
-            "Только латинские буквы, цифры и знак подчеркивания, множественные"
-            " знаки подчеркивания запрещены"
-        )
-
-
-def url_postfix_validator(value):
-    if value is not None and not re.fullmatch("[A-Za-z0-9_]+", value):
-        raise ValidationError(
-            "Только латинские буквы, цифры и знак подчеркивания"
-        )
+from utils import filename_validator, url_postfix_validator
 
 
 class DistributionModel(models.Model):
+    """
+    Абстрактная моделька для распространения файлов по api или через
+    локальный файл
+    """
+
     LOCAL = "LOCAL"
     API = "API"
     API_AND_LOCAL = "API_LOCAL"
@@ -39,7 +26,7 @@ class DistributionModel(models.Model):
 
     is_active = models.BooleanField("Активирован", default=True)
 
-    title = models.CharField("Название", max_length=50, unique=True)
+    title = models.CharField("Название", max_length=50)
 
     description = models.CharField("Описание", max_length=300, blank=True)
 
@@ -74,7 +61,7 @@ class DistributionModel(models.Model):
             models.UniqueConstraint(
                 fields=["local_filename"],
                 condition=Q(local_filename__isnull=False),
-                name="distribution_local_filename_unique",
+                name="%(app_label)s_%(class)s_distribution_local_filename_unique",
                 violation_error_message=(
                     "Название локального файла должно быть уникальным"
                 ),
@@ -82,7 +69,7 @@ class DistributionModel(models.Model):
             models.UniqueConstraint(
                 fields=["url"],
                 condition=Q(url__isnull=False),
-                name="distribution_url_unique",
+                name="%(app_label)s_%(class)s_distribution_url_unique",
                 violation_error_message="Постфикс url должен быть уникальным",
             ),
         ]

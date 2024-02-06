@@ -5,22 +5,29 @@ from discord_webhook import DiscordWebhook
 from requests.exceptions import Timeout
 
 
-def send_messages_to_discord(webhook, username, messages=None):
+def send_messages_to_discord(
+    webhook_uri: str,
+    username: str,
+    messages: list[str] | str = None,
+) -> None:
     if isinstance(messages, str):
-        messages = [messages]
+        messages: list[str] = [messages]
     elif not isinstance(messages, Sequence):
-        raise ValueError('message must be a sequence')
+        raise ValueError("message must be a sequence")
 
-    webhook = DiscordWebhook(
-        url=webhook, username=username, rate_limit_retry=True
+    discord_webhook = DiscordWebhook(
+        url=webhook_uri,
+        username=username,
+        rate_limit_retry=True,
     )
 
     for text in messages:
-        webhook.content = text
-        last_error = None
+        discord_webhook.content = text
+        last_error: None | Exception = None
         for _ in range(3):
             try:
-                webhook.execute()
+                discord_webhook.execute()
+                last_error = None
             except Timeout as e:
                 logging.warning(
                     f'Timeout when send message "{text}" to discord'
@@ -34,4 +41,6 @@ def send_messages_to_discord(webhook, username, messages=None):
             break
 
         if last_error is not None:
-            raise last_error
+            logging.error(
+                "Ошибка при отправке сообщения в дискорд", exc_info=last_error
+            )
