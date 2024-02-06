@@ -63,7 +63,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "squad_admin_configurator.wsgi.application"
 
-if DEBUG:
+if CONFIG["DJANGO"]["SQLITE"]:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
@@ -143,7 +143,8 @@ CRON_CLASSES = [
     "server_admins.cron.DisablingServerPrivilegedByEndTime",
     "server_rotations_api.cron.CreateRotationsFiles",
 ]
-DJANGO_CRON_DELETE_LOGS_OLDER_THAN = 90
+
+DJANGO_CRON_DELETE_LOGS_OLDER_THAN = CONFIG["CRON"]["DELETE_LOGS_OLDER_THAN"]
 
 TIME_FORMAT = "%d-%m-%y %H:%M:%S"
 
