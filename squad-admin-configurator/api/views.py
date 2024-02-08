@@ -4,21 +4,39 @@ from django.db import transaction
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from server_admins.models import Privileged, ServerPrivileged
+from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
+from server_admins.models import (
+    Permission,
+    Privileged,
+    Role,
+    Server,
+    ServerPrivileged,
+)
 
 from .models import AdminsConfigDistribution, RoleWebhook, WebhookLog
-from .serializers import RoleWebhookSerializer
+from .serializers import (
+    PermissionSerializer,
+    PrivilegedSerializer,
+    RoleSerialzier,
+    RoleWebhookSerializer,
+    ServerPrivilegedSerializer,
+    ServerSerializer,
+    WebhookLogSerializer,
+)
 
 
 class RoleWebhookView(APIView):
     """
     Добавление новых ролей пользователям при вызове вебхука
     """
+
+    permission_classes = []
 
     def post(self, request: Request, url) -> Response:
         webhook: RoleWebhook = get_object_or_404(RoleWebhook, url=url)
@@ -112,6 +130,8 @@ class ServerConfigView(APIView):
     с определенным постфиксом
     """
 
+    permission_classes = []
+
     def get(self, request, url):
         server_url = get_object_or_404(
             AdminsConfigDistribution.objects.select_related("server"),
@@ -124,3 +144,59 @@ class ServerConfigView(APIView):
             )
 
         return Response(status=status.HTTP_403_FORBIDDEN)
+
+
+class ServerViewSet(ModelViewSet):
+    """View set для доступа к списку серверов"""
+
+    queryset = Server.objects.all()
+    serializer_class = ServerSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["is_active", "title", "id"]
+
+
+class PermissionViewSet(ModelViewSet):
+    """View set для доступа к списку разрешений"""
+
+    queryset = Permission.objects.all()
+    serializer_class = PermissionSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["title"]
+
+
+class RoleViewSet(ModelViewSet):
+    """View set для доступа к списку ролей"""
+
+    queryset = Role.objects.all()
+    serializer_class = RoleSerialzier
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["title", "is_active", "permissions"]
+
+
+class PrivilegedViewSet(ModelViewSet):
+    """View set для доступа к привилегированным пользователям"""
+
+    queryset = Privileged.objects.prefetch_related(
+        "serverprivileged_set"
+    ).all()
+    serializer_class = PrivilegedSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["name", "steam_id", "is_active"]
+
+
+class ServerPrivilegedViewSet(ModelViewSet):
+    """View set для доступа к привилегированным пользователям на серверах"""
+
+    queryset = ServerPrivileged.objects.all()
+    serializer_class = ServerPrivilegedSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["server", "privileged", "roles", "is_active"]
+
+
+class WebhookLogViewSet(ReadOnlyModelViewSet):
+    """View set только на чтение для доступа к логам вебхуков"""
+
+    queryset = WebhookLog.objects.all()
+    serializer_class = WebhookLogSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["level"]
