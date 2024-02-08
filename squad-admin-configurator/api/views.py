@@ -176,7 +176,9 @@ class RoleViewSet(ModelViewSet):
 class PrivilegedViewSet(ModelViewSet):
     """View set для доступа к привилегированным пользователям"""
 
-    queryset = Privileged.objects.all()
+    queryset = Privileged.objects.prefetch_related(
+        "serverprivileged_set"
+    ).all()
     serializer_class = PrivilegedSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["name", "steam_id", "is_active"]

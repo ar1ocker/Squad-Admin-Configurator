@@ -36,17 +36,21 @@ class RoleSerialzier(QueryFieldsMixin, serializers.ModelSerializer):
         fields = "__all__"
 
 
-class PrivilegedSerializer(QueryFieldsMixin, serializers.ModelSerializer):
-    class Meta:
-        model = Privileged
-        fields = "__all__"
-
-
 class ServerPrivilegedSerializer(
     QueryFieldsMixin, serializers.ModelSerializer
 ):
     class Meta:
         model = ServerPrivileged
+        fields = "__all__"
+
+
+class PrivilegedSerializer(QueryFieldsMixin, serializers.ModelSerializer):
+    servers_roles = ServerPrivilegedSerializer(
+        source="serverprivileged_set", many=True, read_only=True
+    )
+
+    class Meta:
+        model = Privileged
         fields = "__all__"
 
 
