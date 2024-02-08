@@ -8,7 +8,9 @@ from .models import RotationDistribution
 
 
 class GetCurrentRotationConfig(APIView):
-    """Получение текущего списка ротаций"""
+    """Получение текущего списка карт"""
+
+    permission_classes = []
 
     def get(self, request, url):
         distrib = get_object_or_404(
@@ -25,6 +27,10 @@ class GetCurrentRotationConfig(APIView):
 
 
 class GetNextRotationConfig(APIView):
+    """Получение следующего в очереди списка карт"""
+
+    permission_classes = []
+
     def get(self, request, url):
         distrib = get_object_or_404(
             RotationDistribution.objects.select_related("rotation"), url=url

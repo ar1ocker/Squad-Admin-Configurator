@@ -25,7 +25,10 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "rest_framework.authtoken",
+    "django_filters",
     "admin_ordering",
+    "auth_api.apps.AuthApiConfig",
     "server_rotations.apps.ServerRotationsConfig",
     "server_rotations_api.apps.ServerRotationsApiConfig",
     "server_admins.apps.ServerAdminsConfig",
@@ -154,3 +157,12 @@ HMAC_VALIDATION = CONFIG["HMAC_VALIDATION"]
 ADMIN_SITE_HEADER = CONFIG["ADMIN_SITE"]["ADMIN_SITE_HEADER"]
 ADMIN_SITE_TITLE = CONFIG["ADMIN_SITE"]["ADMIN_SITE_TITLE"]
 ADMIN_INDEX_TITLE = CONFIG["ADMIN_SITE"]["ADMIN_INDEX_TITLE"]
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": (
+        "rest_framework.permissions.DjangoModelPermissions",
+    ),
+}

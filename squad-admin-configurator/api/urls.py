@@ -1,8 +1,25 @@
-from django.urls import path
+from django.urls import include, path
+from rest_framework.routers import SimpleRouter
 
-from .views import RoleWebhookView, ServerConfigView
+from .views import (
+    PermissionViewSet,
+    PrivilegedViewSet,
+    RoleViewSet,
+    RoleWebhookView,
+    ServerConfigView,
+    ServerPrivilegedViewSet,
+    ServerViewSet,
+)
 
 app_name = "api"
+
+router = SimpleRouter()
+
+router.register("servers", ServerViewSet)
+router.register("permissions", PermissionViewSet)
+router.register("roles", RoleViewSet)
+router.register("privileges", PrivilegedViewSet)
+router.register("server_privileges", ServerPrivilegedViewSet)
 
 urlpatterns = [
     path(
@@ -11,6 +28,9 @@ urlpatterns = [
         name="server_config",
     ),
     path(
-        "role_webhook/<url>/", RoleWebhookView.as_view(), name="role_webhook"
+        "role_webhook/<url>/",
+        RoleWebhookView.as_view(),
+        name="role_webhook",
     ),
+    path("", include(router.urls)),
 ]
