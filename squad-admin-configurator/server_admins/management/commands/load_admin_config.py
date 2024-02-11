@@ -34,7 +34,9 @@ class Command(BaseCommand):
     help = "Добавление админов, разрешений и ролей из конфига администраторов"
 
     def add_arguments(self, parser: CommandParser) -> None:
-        parser.add_argument("file", type=argparse.FileType("r"))
+        parser.add_argument(
+            "file", type=argparse.FileType("r", encoding="utf-8")
+        )
 
     def handle(self, *args, **options):
         processing_comment = question_with_confirmation(
@@ -55,9 +57,9 @@ class Command(BaseCommand):
 
             roles_by_names = self.get_db_roles(roles_list)
 
-            privilegeds = self.find_privilegeds(file_text)
+            privileges = self.find_privileges(file_text)
 
-            for config_priv in privilegeds:
+            for config_priv in privileges:
                 role = roles_by_names.get(config_priv["role"])
                 if role is None:
                     self.stdout.write(
@@ -84,7 +86,7 @@ class Command(BaseCommand):
 
                 server_priv.roles.add(role)
 
-    def find_privilegeds(self, file_text):
+    def find_privileges(self, file_text):
         """
         Поиск привилегированных пользователей
         """
@@ -103,12 +105,10 @@ class Command(BaseCommand):
 
         self.stdout.write(
             "Найдены привилегированные пользователи:\n\t"
-            + "\n\t".join(
-                [
-                    f'{admin["role"]}: {admin["steam_id"]}, {admin["comment"]}'
-                    for admin in priv
-                ]
-            )
+            + "\n\t".join([
+                f'{admin["role"]}: {admin["steam_id"]}, {admin["comment"]}'
+                for admin in priv
+            ])
         )
 
         return priv

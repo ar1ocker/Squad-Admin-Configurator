@@ -30,7 +30,9 @@ class Command(BaseCommand):
                 return answer
 
     def add_arguments(self, parser: CommandParser) -> None:
-        parser.add_argument("file", type=argparse.FileType("r"))
+        parser.add_argument(
+            "file", type=argparse.FileType("r", encoding="utf-8")
+        )
         parser.add_argument("--ignore_errors", action="store_true")
 
     def handle(self, *args, **options):
