@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     "server_admins.apps.ServerAdminsConfig",
     "api.apps.ApiConfig",
     "django_cron",
+    "drf_spectacular",
 ]
 
 MIDDLEWARE = [
@@ -165,4 +166,12 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": (
         "permissions.AdvancedDjangoModelPermissions",
     ),
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Squad Admin Configurator",
+    "DESCRIPTION": "Панель управления привилегированными пользователями в Squad",
+    "VERSION": "1.2.1",
+    "SERVE_INCLUDE_SCHEMA": False,
 }
