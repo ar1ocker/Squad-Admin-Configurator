@@ -5,8 +5,15 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import (
+    OpenApiExample,
+    OpenApiResponse,
+    extend_schema,
+)
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
+from rest_framework.generics import GenericAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -31,14 +38,26 @@ from .serializers import (
 )
 
 
-class RoleWebhookView(APIView):
+class RoleWebhookView(GenericAPIView):
     """
-    Добавление новых ролей пользователям при вызове вебхука
+    Добавление новых ролей пользователям при вызове вебхука post запросом
     """
 
+    serializer_class = RoleWebhookSerializer
     permission_classes = []
 
-    def post(self, request: Request, url) -> Response:
+    @extend_schema(
+        responses={
+            200: OpenApiResponse(
+                OpenApiTypes.JSON_PTR,
+                "Создано",
+                examples=[OpenApiExample("Пример", {"detail": "created"})],
+            ),
+            403: OpenApiResponse(OpenApiTypes.JSON_PTR, "Вебхук не активен"),
+            404: OpenApiResponse(OpenApiTypes.JSON_PTR, "Вебхук не найден"),
+        }
+    )
+    def post(self, request: Request, url: str) -> Response:
         webhook: RoleWebhook = get_object_or_404(RoleWebhook, url=url)
 
         if not webhook.is_active:
@@ -54,7 +73,7 @@ class RoleWebhookView(APIView):
             )
             raise error
 
-        serializer = RoleWebhookSerializer(data=request.data)
+        serializer = self.get_serializer(data=request.data)
 
         if not serializer.is_valid():
             webhook.write_log(
@@ -132,7 +151,17 @@ class ServerConfigView(APIView):
 
     permission_classes = []
 
-    def get(self, request, url):
+    @extend_schema(
+        methods=["get"],
+        responses={
+            (200, "text/plain;charset=UTF-8"): OpenApiResponse(
+                OpenApiTypes.STR, "Текст конфига сервера"
+            ),
+            404: OpenApiResponse(OpenApiTypes.JSON_PTR, "Сервер не найден"),
+            403: OpenApiResponse(OpenApiTypes.JSON_PTR, "Сервер не активен"),
+        },
+    )
+    def get(self, request: Request, url: str) -> HttpResponse | Response:
         server_url = get_object_or_404(
             AdminsConfigDistribution.objects.select_related("server"),
             url=url,

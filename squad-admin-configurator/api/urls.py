@@ -23,12 +23,12 @@ router.register("server_privileges", ServerPrivilegedViewSet)
 
 urlpatterns = [
     path(
-        "server_config/<url>/",
+        "server_config/<str:url>/",
         ServerConfigView.as_view(),
         name="server_config",
     ),
     path(
-        "role_webhook/<url>/",
+        "role_webhook/<str:url>/",
         RoleWebhookView.as_view(),
         name="role_webhook",
     ),

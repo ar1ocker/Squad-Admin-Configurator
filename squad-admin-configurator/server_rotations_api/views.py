@@ -1,5 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -12,7 +14,21 @@ class GetCurrentRotationConfig(APIView):
 
     permission_classes = []
 
-    def get(self, request, url):
+    @extend_schema(
+        methods=["get"],
+        responses={
+            (200, "text/plain;charset=UTF-8"): OpenApiResponse(
+                OpenApiTypes.STR, description="Текст ротации"
+            ),
+            404: OpenApiResponse(
+                OpenApiTypes.JSON_PTR, description="Ротация не найдена"
+            ),
+            403: OpenApiResponse(
+                OpenApiTypes.JSON_PTR, description="Ротация не активна"
+            ),
+        },
+    )
+    def get(self, request, url: str) -> HttpResponse | Response:
         distrib = get_object_or_404(
             RotationDistribution.objects.select_related("rotation"), url=url
         )
@@ -31,7 +47,17 @@ class GetNextRotationConfig(APIView):
 
     permission_classes = []
 
-    def get(self, request, url):
+    @extend_schema(
+        methods=["get"],
+        responses={
+            (200, "text/plain;charset=UTF-8"): OpenApiResponse(
+                OpenApiTypes.STR, "Текст ротации"
+            ),
+            404: OpenApiResponse(OpenApiTypes.JSON_PTR, "Ротация не найдена"),
+            403: OpenApiResponse(OpenApiTypes.JSON_PTR, "Ротация не активна"),
+        },
+    )
+    def get(self, request, url: str) -> HttpResponse | Response:
         distrib = get_object_or_404(
             RotationDistribution.objects.select_related("rotation"), url=url
         )

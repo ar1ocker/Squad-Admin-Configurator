@@ -6,12 +6,12 @@ app_name = "server_rotations_api"
 
 urlpatterns = [
     path(
-        "<url>/current/",
+        "<str:url>/current/",
         GetCurrentRotationConfig.as_view(),
         name="current_rotation_config",
     ),
     path(
-        "<url>/next/",
+        "<str:url>/next/",
         GetNextRotationConfig.as_view(),
         name="next_rotation_config",
     ),
