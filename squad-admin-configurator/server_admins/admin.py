@@ -26,6 +26,8 @@ class ServerPrivilegedInline(admin.StackedInline):
     filter_horizontal = ("roles",)
     model = ServerPrivileged
     extra = 0
+    autocomplete_fields = ("server",)
+    verbose_name_plural = "Роли на серверах"
 
 
 @admin.register(Server)
@@ -42,6 +44,52 @@ class AdminServer(admin.ModelAdmin):
     )
     ordering = ("-title",)
     list_filter = ("is_active",)
+
+
+@admin.register(ServerPrivileged)
+class ServerPrivilegedAdmin(admin.ModelAdmin):
+    fields = (
+        "is_active",
+        "privileged",
+        "server",
+        "roles",
+        "creation_date",
+        "date_of_end",
+    )
+    readonly_fields = ("creation_date",)
+    list_display = (
+        "is_active",
+        "privileged",
+        "server",
+        "get_roles",
+        "creation_date",
+        "date_of_end_view",
+    )
+    list_display_links = ("privileged", "server")
+    list_editable = ("is_active",)
+    list_filter = (
+        "is_active",
+        "privileged__is_active",
+        "roles",
+        "date_of_end",
+        "creation_date",
+    )
+    ordering = ("-creation_date",)
+    search_fields = ("privileged__steam_id", "privileged__name")
+    autocomplete_fields = ("server", "privileged")
+    filter_horizontal = ("roles",)
+
+    @admin.display(
+        ordering="-date_of_end",
+        empty_value="Бессрочно",
+        description="Дата окончания полномочий",
+    )
+    def date_of_end_view(self, obj):
+        return obj.date_of_end
+
+    @admin.display(description="Роли на сервере")
+    def get_roles(self, obj) -> str:
+        return ", ".join(obj.roles.values_list("title", flat=True))
 
 
 @admin.register(Role)

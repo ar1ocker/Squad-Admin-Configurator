@@ -169,7 +169,7 @@ class ServerPrivileged(models.Model):
     is_active = models.BooleanField("Активирована", default=True)
     creation_date = models.DateTimeField("Дата добавления", auto_now_add=True)
     date_of_end = models.DateTimeField(
-        "Дата окончания этой роли", blank=True, null=True
+        "Дата окончания роли", blank=True, null=True
     )
 
     comment = models.CharField("Комментарий", blank=True, max_length=200)
@@ -179,4 +179,4 @@ class ServerPrivileged(models.Model):
 
     class Meta:
         verbose_name = "Роль на сервере"
-        verbose_name_plural = "Роли на серверах"
+        verbose_name_plural = "5. Роли пользователей на серверах"
