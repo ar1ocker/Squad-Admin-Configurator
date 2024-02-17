@@ -1,7 +1,12 @@
+import adminactions.actions as actions
 from django.contrib import admin
+from django.contrib.admin import site
 
 from .models import Permission, Privileged, Role, Server, ServerPrivileged
 from .utils import date_or_perpetual
+
+# Регистрация всех action из adminactions
+actions.add_to_site(site)
 
 
 def custom_titled_filter(title):

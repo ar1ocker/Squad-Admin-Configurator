@@ -18,6 +18,7 @@ ALLOWED_HOSTS = CONFIG["DJANGO"]["ALLOWED_HOSTS"]
 CSRF_TRUSTED_ORIGINS = CONFIG["DJANGO"]["CSRF_TRUSTED_ORIGINS"]
 
 INSTALLED_APPS = [
+    "adminactions",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",

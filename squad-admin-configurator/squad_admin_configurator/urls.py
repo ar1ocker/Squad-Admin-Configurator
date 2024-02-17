@@ -12,5 +12,6 @@ urlpatterns = [
         "v1/api/rotations/",
         include("server_rotations_api.urls", namespace="rotations_api"),
     ),
+    path("adminactions/", include("adminactions.urls")),
     path("", admin.site.urls),
 ]
