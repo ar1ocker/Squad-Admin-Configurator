@@ -1,6 +1,8 @@
 import adminactions.actions as actions
 from django.contrib import admin
 from django.contrib.admin import site
+from django.utils.html import format_html_join
+from django.utils.safestring import mark_safe
 
 from .models import Permission, Privileged, Role, Server, ServerPrivileged
 from .utils import date_or_perpetual
@@ -21,17 +23,17 @@ def custom_titled_filter(title):
 
 class ServerPrivilegedInline(admin.StackedInline):
     fields = (
-        ("is_active", "creation_date", "date_of_end"),
+        "is_active",
+        "creation_date",
+        "date_of_end",
         "server",
         "roles",
         "privileged",
         "comment",
     )
     readonly_fields = ("creation_date",)
-    filter_horizontal = ("roles",)
     model = ServerPrivileged
     extra = 0
-    autocomplete_fields = ("server",)
     verbose_name_plural = "Роли на серверах"
 
 
@@ -81,8 +83,6 @@ class ServerPrivilegedAdmin(admin.ModelAdmin):
     )
     ordering = ("-creation_date",)
     search_fields = ("privileged__steam_id", "privileged__name")
-    autocomplete_fields = ("server", "privileged")
-    filter_horizontal = ("roles",)
 
     @admin.display(
         ordering="-date_of_end",
@@ -169,4 +169,8 @@ class PrivilegedAdmin(admin.ModelAdmin):
                 f"{symbol} {serv.server.title} ({date_of_end}): {roles}"
             )
 
-        return "; ".join(servers_text)
+        return format_html_join(
+            mark_safe("<br>"),
+            "{}",
+            ((i,) for i in servers_text),
+        )
