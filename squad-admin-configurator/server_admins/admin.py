@@ -31,7 +31,7 @@ class ServerPrivilegedInline(admin.StackedInline):
 
 
 @admin.register(Server)
-class AdminServer(admin.ModelAdmin):
+class ServerAdmin(admin.ModelAdmin):
     list_display = (
         "title",
         "description",
@@ -93,14 +93,14 @@ class ServerPrivilegedAdmin(admin.ModelAdmin):
 
 
 @admin.register(Role)
-class AdminRole(admin.ModelAdmin):
+class RoleAdmin(admin.ModelAdmin):
     list_display = ("title", "description", "is_active")
     list_editable = ("is_active",)
     filter_horizontal = ("permissions",)
 
 
 @admin.register(Permission)
-class AdminPermission(admin.ModelAdmin):
+class PermissionAdmin(admin.ModelAdmin):
     list_display = (
         "title",
         "description",
@@ -108,7 +108,7 @@ class AdminPermission(admin.ModelAdmin):
 
 
 @admin.register(Privileged)
-class AdminPrivileged(admin.ModelAdmin):
+class PrivilegedAdmin(admin.ModelAdmin):
     inlines = (ServerPrivilegedInline,)
     fields = (
         "is_active",
