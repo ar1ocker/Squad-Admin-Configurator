@@ -1,7 +1,14 @@
+import adminactions.actions as actions
 from django.contrib import admin
+from django.contrib.admin import site
+from django.utils.html import format_html_join
+from django.utils.safestring import mark_safe
 
 from .models import Permission, Privileged, Role, Server, ServerPrivileged
 from .utils import date_or_perpetual
+
+# Регистрация всех action из adminactions
+actions.add_to_site(site)
 
 
 def custom_titled_filter(title):
@@ -16,20 +23,22 @@ def custom_titled_filter(title):
 
 class ServerPrivilegedInline(admin.StackedInline):
     fields = (
-        ("is_active", "creation_date", "date_of_end"),
+        "is_active",
+        "creation_date",
+        "date_of_end",
         "server",
         "roles",
         "privileged",
         "comment",
     )
     readonly_fields = ("creation_date",)
-    filter_horizontal = ("roles",)
     model = ServerPrivileged
     extra = 0
+    verbose_name_plural = "Роли на серверах"
 
 
 @admin.register(Server)
-class AdminServer(admin.ModelAdmin):
+class ServerAdmin(admin.ModelAdmin):
     list_display = (
         "title",
         "description",
@@ -44,15 +53,59 @@ class AdminServer(admin.ModelAdmin):
     list_filter = ("is_active",)
 
 
+@admin.register(ServerPrivileged)
+class ServerPrivilegedAdmin(admin.ModelAdmin):
+    fields = (
+        "is_active",
+        "privileged",
+        "server",
+        "roles",
+        "creation_date",
+        "date_of_end",
+    )
+    readonly_fields = ("creation_date",)
+    list_display = (
+        "is_active",
+        "privileged",
+        "server",
+        "get_roles",
+        "creation_date",
+        "date_of_end_view",
+    )
+    list_display_links = ("privileged", "server")
+    list_editable = ("is_active",)
+    list_filter = (
+        "is_active",
+        "privileged__is_active",
+        "roles",
+        "date_of_end",
+        "creation_date",
+    )
+    ordering = ("-creation_date",)
+    search_fields = ("privileged__steam_id", "privileged__name")
+
+    @admin.display(
+        ordering="-date_of_end",
+        empty_value="Бессрочно",
+        description="Дата окончания полномочий",
+    )
+    def date_of_end_view(self, obj):
+        return obj.date_of_end
+
+    @admin.display(description="Роли на сервере")
+    def get_roles(self, obj) -> str:
+        return ", ".join(obj.roles.values_list("title", flat=True))
+
+
 @admin.register(Role)
-class AdminRole(admin.ModelAdmin):
+class RoleAdmin(admin.ModelAdmin):
     list_display = ("title", "description", "is_active")
     list_editable = ("is_active",)
     filter_horizontal = ("permissions",)
 
 
 @admin.register(Permission)
-class AdminPermission(admin.ModelAdmin):
+class PermissionAdmin(admin.ModelAdmin):
     list_display = (
         "title",
         "description",
@@ -60,7 +113,7 @@ class AdminPermission(admin.ModelAdmin):
 
 
 @admin.register(Privileged)
-class AdminPrivileged(admin.ModelAdmin):
+class PrivilegedAdmin(admin.ModelAdmin):
     inlines = (ServerPrivilegedInline,)
     fields = (
         "is_active",
@@ -116,4 +169,8 @@ class AdminPrivileged(admin.ModelAdmin):
                 f"{symbol} {serv.server.title} ({date_of_end}): {roles}"
             )
 
-        return "; ".join(servers_text)
+        return format_html_join(
+            mark_safe("<br>"),
+            "{}",
+            ((i,) for i in servers_text),
+        )

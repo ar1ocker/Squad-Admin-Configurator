@@ -18,6 +18,8 @@ ALLOWED_HOSTS = CONFIG["DJANGO"]["ALLOWED_HOSTS"]
 CSRF_TRUSTED_ORIGINS = CONFIG["DJANGO"]["CSRF_TRUSTED_ORIGINS"]
 
 INSTALLED_APPS = [
+    "adminactions",
+    "jet",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -175,3 +177,5 @@ SPECTACULAR_SETTINGS = {
     "VERSION": "1.2.1",
     "SERVE_INCLUDE_SCHEMA": False,
 }
+
+X_FRAME_OPTIONS = "sameorigin"

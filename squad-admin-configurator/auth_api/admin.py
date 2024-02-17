@@ -4,7 +4,5 @@ from rest_framework.authtoken.models import TokenProxy as OriginalTokenProxy
 
 from .models import TokenProxy
 
-TokenAdmin.raw_id_fields = ["user"]
-
 admin.site.unregister(OriginalTokenProxy)
 admin.site.register(TokenProxy, TokenAdmin)
