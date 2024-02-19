@@ -47,6 +47,7 @@ class RotationLayersPackFormset(BaseInlineFormSet):
 
             if start_date not in seen_data:
                 seen_data.add(start_date)
+                continue
 
             form._errors[NON_FIELD_ERRORS] = self.error_class(
                 ["Дата применения ротации должна быть уникальной"],
