@@ -30,7 +30,9 @@ class PermissionSerializer(QueryFieldsMixin, serializers.ModelSerializer):
         fields = "__all__"
 
 
-class RoleSerialzier(QueryFieldsMixin, serializers.ModelSerializer):
+class RoleSerializer(QueryFieldsMixin, serializers.ModelSerializer):
+    permissions = PermissionSerializer(many=True, read_only=True)
+
     class Meta:
         model = Role
         fields = "__all__"
@@ -39,6 +41,8 @@ class RoleSerialzier(QueryFieldsMixin, serializers.ModelSerializer):
 class ServerPrivilegedSerializer(
     QueryFieldsMixin, serializers.ModelSerializer
 ):
+    roles = RoleSerializer(many=True, read_only=True)
+
     class Meta:
         model = ServerPrivileged
         fields = "__all__"

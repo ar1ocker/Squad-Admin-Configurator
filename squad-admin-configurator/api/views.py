@@ -30,7 +30,7 @@ from .models import AdminsConfigDistribution, RoleWebhook, WebhookLog
 from .serializers import (
     PermissionSerializer,
     PrivilegedSerializer,
-    RoleSerialzier,
+    RoleSerializer,
     RoleWebhookSerializer,
     ServerPrivilegedSerializer,
     ServerSerializer,
@@ -99,11 +99,13 @@ class RoleWebhookView(GenericAPIView):
         with transaction.atomic():
             priv, created = Privileged.objects.get_or_create(
                 steam_id=serializer.validated_data["steam_id"],
-                defaults=({
-                    "name": serializer.validated_data["name"],
-                    "description": serializer.validated_data["comment"],
-                    "date_of_end": date_of_end,
-                }),
+                defaults=(
+                    {
+                        "name": serializer.validated_data["name"],
+                        "description": serializer.validated_data["comment"],
+                        "date_of_end": date_of_end,
+                    }
+                ),
             )
 
             if not created and webhook.active_and_increase_common_date_of_end:
@@ -196,8 +198,8 @@ class PermissionViewSet(ModelViewSet):
 class RoleViewSet(ModelViewSet):
     """View set для доступа к списку ролей"""
 
-    queryset = Role.objects.all()
-    serializer_class = RoleSerialzier
+    queryset = Role.objects.prefetch_related("permissions").all()
+    serializer_class = RoleSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["title", "is_active", "permissions"]
 
@@ -206,7 +208,7 @@ class PrivilegedViewSet(ModelViewSet):
     """View set для доступа к привилегированным пользователям"""
 
     queryset = Privileged.objects.prefetch_related(
-        "serverprivileged_set"
+        "serverprivileged_set__roles",
     ).all()
     serializer_class = PrivilegedSerializer
     filter_backends = [DjangoFilterBackend]
@@ -216,7 +218,7 @@ class PrivilegedViewSet(ModelViewSet):
 class ServerPrivilegedViewSet(ModelViewSet):
     """View set для доступа к привилегированным пользователям на серверах"""
 
-    queryset = ServerPrivileged.objects.all()
+    queryset = ServerPrivileged.objects.prefetch_related("roles").all()
     serializer_class = ServerPrivilegedSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["server", "privileged", "roles", "is_active"]
