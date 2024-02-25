@@ -14,6 +14,7 @@ from drf_spectacular.utils import (
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import GenericAPIView
+from rest_framework.permissions import SAFE_METHODS
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -31,8 +32,10 @@ from .serializers import (
     PermissionSerializer,
     PrivilegedSerializer,
     RoleSerializer,
+    RoleSerializerWrite,
     RoleWebhookSerializer,
     ServerPrivilegedSerializer,
+    ServerPrivilegedSerializerWrite,
     ServerSerializer,
     WebhookLogSerializer,
 )
@@ -199,16 +202,34 @@ class RoleViewSet(ModelViewSet):
     """View set для доступа к списку ролей"""
 
     queryset = Role.objects.prefetch_related("permissions").all()
-    serializer_class = RoleSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["title", "is_active", "permissions"]
+
+    def get_queryset(self):
+        base_manager = Role.objects.prefetch_related("permissions")
+
+        server_privileges_pk: str | None = self.kwargs.get(
+            "server_privileges_pk"
+        )
+        if server_privileges_pk:
+            return base_manager.filter(
+                serverprivileged=server_privileges_pk
+            ).all()
+
+        return base_manager.all()
+
+    def get_serializer_class(self):
+        if self.request.method in SAFE_METHODS:
+            return RoleSerializer
+        else:
+            return RoleSerializerWrite
 
 
 class PrivilegedViewSet(ModelViewSet):
     """View set для доступа к привилегированным пользователям"""
 
     queryset = Privileged.objects.prefetch_related(
-        "serverprivileged_set__roles",
+        "serverprivileged_set__roles", "serverprivileged_set__server"
     ).all()
     serializer_class = PrivilegedSerializer
     filter_backends = [DjangoFilterBackend]
@@ -218,10 +239,26 @@ class PrivilegedViewSet(ModelViewSet):
 class ServerPrivilegedViewSet(ModelViewSet):
     """View set для доступа к привилегированным пользователям на серверах"""
 
-    queryset = ServerPrivileged.objects.prefetch_related("roles").all()
-    serializer_class = ServerPrivilegedSerializer
+    queryset = ServerPrivileged.objects.all()
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["server", "privileged", "roles", "is_active"]
+
+    def get_queryset(self):
+        base_manager = ServerPrivileged.objects.prefetch_related(
+            "roles"
+        ).select_related("server")
+
+        privileged_pk: str | None = self.kwargs.get("privileged_pk")
+        if privileged_pk:
+            return base_manager.filter(privileged=privileged_pk).all()
+
+        return base_manager.all()
+
+    def get_serializer_class(self):
+        if self.request.method in SAFE_METHODS:
+            return ServerPrivilegedSerializer
+        else:
+            return ServerPrivilegedSerializerWrite
 
 
 class WebhookLogViewSet(ReadOnlyModelViewSet):
