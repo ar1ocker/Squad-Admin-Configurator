@@ -30,7 +30,19 @@ class PermissionSerializer(QueryFieldsMixin, serializers.ModelSerializer):
         fields = "__all__"
 
 
-class RoleSerialzier(QueryFieldsMixin, serializers.ModelSerializer):
+class RoleSerializer(QueryFieldsMixin, serializers.ModelSerializer):
+    permissions = PermissionSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Role
+        fields = "__all__"
+
+
+class RoleSerializerWrite(serializers.ModelSerializer):
+    permissions = serializers.PrimaryKeyRelatedField(
+        queryset=Permission.objects.all(), many=True, allow_null=True
+    )
+
     class Meta:
         model = Role
         fields = "__all__"
@@ -39,6 +51,20 @@ class RoleSerialzier(QueryFieldsMixin, serializers.ModelSerializer):
 class ServerPrivilegedSerializer(
     QueryFieldsMixin, serializers.ModelSerializer
 ):
+    roles = RoleSerializer(many=True, read_only=True)
+    server = ServerSerializer(read_only=True)
+
+    class Meta:
+        model = ServerPrivileged
+        fields = "__all__"
+
+
+class ServerPrivilegedSerializerWrite(serializers.ModelSerializer):
+    roles = serializers.PrimaryKeyRelatedField(
+        queryset=Role.objects.all(), many=True, allow_null=True
+    )
+    server = serializers.PrimaryKeyRelatedField(queryset=Server.objects.all())
+
     class Meta:
         model = ServerPrivileged
         fields = "__all__"
