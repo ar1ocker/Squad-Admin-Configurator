@@ -18,4 +18,4 @@ RUN pip3 install -r requirements.txt --no-cache-dir
 RUN mkdir static
 RUN chmod -R o+x static
 
-CMD ["sh", "-c", "python3 manage.py collectstatic --noinput && python3 manage.py makemigrations --noinput && python3 manage.py migrate --noinput && python3 /tmp/debugpy --wait-for-client --listen 0.0.0.0:5678 manage.py runserver 0.0.0.0:8000 --insecure"]
+CMD ["sh", "-c", "python3 manage.py collectstatic --noinput --clear && python3 manage.py makemigrations --noinput && python3 manage.py migrate --noinput && python3 /tmp/debugpy --wait-for-client --listen 0.0.0.0:5678 manage.py runserver 0.0.0.0:8000 --insecure"]

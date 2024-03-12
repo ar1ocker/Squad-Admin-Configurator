@@ -305,7 +305,15 @@ class RoleWebhook(ReceivedWebhook):
     )
 
     duration_until_end = models.IntegerField(
-        "Стандартно выдаваемая продолжительность полномочий",
+        "Стандартно выдаваемая продолжительность полномочий, оставьте пустым для бессрочных полномочий",
+        null=True,
+        blank=True,
+    )
+
+    set_common_date_of_end = models.BooleanField(
+        "Устанавливать ли общее время до окончания полномочий при создании новых пользователей",
+        default=False,
+        help_text="Если пользователь с переданным steam_id не будет найден - он будет создан",
     )
 
     active_and_increase_common_date_of_end = models.BooleanField(
