@@ -22,10 +22,7 @@ def create_local_config(distrib: AdminsConfigDistribution) -> None:
     Генерация локального конфига администраторов
     для отдельного игрового сервера
     """
-    if (
-        distrib.type_of_distribution
-        not in AdminsConfigDistribution.TYPES_OF_DISTRIBUTION_WITH_LOCAL
-    ):
+    if distrib.type_of_distribution not in AdminsConfigDistribution.TYPES_OF_DISTRIBUTION_WITH_LOCAL:
         return
 
     settings.ADMINS_CONFIG_DIR.mkdir(exist_ok=True)

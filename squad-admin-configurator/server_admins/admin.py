@@ -156,18 +156,14 @@ class PrivilegedAdmin(admin.ModelAdmin):
 
     @admin.display(description="Роли на всех серверах")
     def get_roles(self, obj) -> str:
-        servers_roles = obj.serverprivileged_set.select_related(
-            "server"
-        ).prefetch_related("roles")
+        servers_roles = obj.serverprivileged_set.select_related("server").prefetch_related("roles")
         servers_text = []
         for serv in servers_roles:
             symbol = "🟢" if serv.is_active else "🔴"
             date_of_end = date_or_perpetual(serv.date_of_end)
             roles = ", ".join(serv.roles.values_list("title", flat=True))
 
-            servers_text.append(
-                f"{symbol} {serv.server.title} ({date_of_end}): {roles}"
-            )
+            servers_text.append(f"{symbol} {serv.server.title} ({date_of_end}): {roles}")
 
         return format_html_join(
             mark_safe("<br>"),

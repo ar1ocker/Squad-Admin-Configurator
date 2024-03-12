@@ -33,11 +33,7 @@ class RotationLayersPackFormset(BaseInlineFormSet):
             error_message = e.message_dict
 
         # Валидные формы которые не будут удаляться
-        valid_forms = [
-            form
-            for form in self.forms
-            if form.is_valid() and form not in self.deleted_forms
-        ]
+        valid_forms = [form for form in self.forms if form.is_valid() and form not in self.deleted_forms]
 
         seen_data = set()
         for form in valid_forms:
@@ -56,9 +52,7 @@ class RotationLayersPackFormset(BaseInlineFormSet):
             error = True
 
         if error:
-            raise ValidationError(
-                error_message or "Ошибка при задании даты применения ротации"
-            )
+            raise ValidationError(error_message or "Ошибка при задании даты применения ротации")
 
 
 class RotationLayersPackInline(OrderableAdmin, admin.TabularInline):

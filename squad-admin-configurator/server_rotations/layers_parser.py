@@ -52,12 +52,8 @@ class LayerSpec(Enum):
             match node.kind:
                 case LayerSpec.NEWLINE.name:
                     current_line += 1
-                case (
-                    LayerSpec.MISMATCH.name | LayerSpec.MISMATCH_SPELLING.name
-                ):
-                    errors.append(
-                        error_description(node.kind, current_line, node.value)
-                    )
+                case LayerSpec.MISMATCH.name | LayerSpec.MISMATCH_SPELLING.name:
+                    errors.append(error_description(node.kind, current_line, node.value))
 
         return errors
 
@@ -68,7 +64,4 @@ def error_description(kind, line, value):
         case LayerSpec.MISMATCH.name:
             return f"Неизвестный символ '{value}' в строке #{line}"
         case LayerSpec.MISMATCH_SPELLING.name:
-            return (
-                f"Название леера '{value}' должно находится в начале"
-                f" строки, строка с ошибкой #{line}"
-            )
+            return f"Название леера '{value}' должно находится в начале строки, строка с ошибкой #{line}"

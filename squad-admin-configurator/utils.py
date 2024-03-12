@@ -31,12 +31,9 @@ def textarea_form(model, fields: list):
 
 
 def filename_validator(value) -> None:
-    if value is not None and not re.fullmatch(
-        r"^(?!.*[_-][_-])[A-Za-z0-9_]+$", value
-    ):
+    if value is not None and not re.fullmatch(r"^(?!.*[_-][_-])[A-Za-z0-9_]+$", value):
         raise ValidationError(
-            "Только латинские буквы, цифры и знак подчеркивания, множественные"
-            " знаки подчеркивания запрещены"
+            "Только латинские буквы, цифры и знак подчеркивания, множественные знаки подчеркивания запрещены"
         )
 
 
@@ -49,6 +46,4 @@ def regex_validator(value) -> None:
 
 def url_postfix_validator(value) -> None:
     if value is not None and not re.fullmatch("[A-Za-z0-9_]+", value):
-        raise ValidationError(
-            "Только латинские буквы, цифры и знак подчеркивания"
-        )
+        raise ValidationError("Только латинские буквы, цифры и знак подчеркивания")

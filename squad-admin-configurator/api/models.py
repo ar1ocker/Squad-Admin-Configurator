@@ -34,13 +34,9 @@ class WebhookLog(models.Model):
     message = models.TextField("Лог сообщений")
     request_info = models.TextField("Сведения о запросе", blank=True)
     webhook_info = models.TextField("Сведения о вебхуке")
-    level = models.CharField(
-        "Уровень логирования", max_length=10, choices=LOG_LEVELS
-    )
+    level = models.CharField("Уровень логирования", max_length=10, choices=LOG_LEVELS)
 
-    creation_date = models.DateTimeField(
-        "Дата создания сообщения", auto_now_add=True
-    )
+    creation_date = models.DateTimeField("Дата создания сообщения", auto_now_add=True)
 
     content_type = models.ForeignKey(
         ContentType,
@@ -107,9 +103,7 @@ class ReceivedWebhook(models.Model):
         validators=(url_postfix_validator,),
     )
 
-    creation_date = models.DateTimeField(
-        "Дата добавления вебхука", auto_now_add=True
-    )
+    creation_date = models.DateTimeField("Дата добавления вебхука", auto_now_add=True)
 
     hmac_is_active = models.BooleanField(
         "Активирована ли проверка HMAC подписи",
@@ -127,10 +121,7 @@ class ReceivedWebhook(models.Model):
         choices=HMAC_HASHES_CHOICES,
         max_length=64,
         blank=True,
-        help_text=(
-            "Обычно предоставляется тем, кто будет вызывать вебхук, "
-            "например sha256 для Battlemetrics"
-        ),
+        help_text=("Обычно предоставляется тем, кто будет вызывать вебхук, например sha256 для Battlemetrics"),
     )
 
     hmac_secret_key = models.CharField(
@@ -152,10 +143,7 @@ class ReceivedWebhook(models.Model):
         max_length=256,
         blank=True,
         validators=(regex_validator,),
-        help_text=(
-            "Например .* если весь заголовок - сигнатура, "
-            r"или (?<=s=)\w+(?=,|\Z) для Battlemetrics"
-        ),
+        help_text=("Например .* если весь заголовок - сигнатура, " r"или (?<=s=)\w+(?=,|\Z) для Battlemetrics"),
     )
 
     request_sender = models.CharField(
@@ -164,10 +152,7 @@ class ReceivedWebhook(models.Model):
         blank=False,
         default=DEFAULT,
         choices=REQUEST_SENDERS,
-        help_text=(
-            "Активирует специфичные для каждого сервиса алгоритмы "
-            "проверки HMAC у запроса"
-        ),
+        help_text=("Активирует специфичные для каждого сервиса алгоритмы проверки HMAC у запроса"),
     )
 
     def __str__(self) -> str:
@@ -188,9 +173,7 @@ class ReceivedWebhook(models.Model):
             errors = {}
             for name, field in checked_fields.items():
                 if field == "":
-                    errors[name] = (
-                        "Обязательное поле при активированной проверки HMAC"
-                    )
+                    errors[name] = "Обязательное поле при активированной проверки HMAC"
 
             raise ValidationError(errors)
 
@@ -228,9 +211,7 @@ class ReceivedWebhook(models.Model):
             if isinstance(field, datetime):
                 field = field.isoformat()
             elif field.__class__.__name__ == "ManyRelatedManager":
-                field = ", ".join(
-                    [str(m2m_model) for m2m_model in field.all()]
-                )
+                field = ", ".join([str(m2m_model) for m2m_model in field.all()])
 
             return_info.append(f"{verbose_name}: {field}")
 
@@ -245,9 +226,7 @@ class ReceivedWebhook(models.Model):
         request_info: str = ""
         if request is not None:
             ip, _ = get_client_ip(request)
-            request_info = (
-                f"IP: {ip}\nUser-agent: {request.headers.get('user-agent')}"
-            )
+            request_info = f"IP: {ip}\nUser-agent: {request.headers.get('user-agent')}"
 
         WebhookLog.objects.create(
             message=message,
@@ -257,13 +236,11 @@ class ReceivedWebhook(models.Model):
             request_info=request_info,
         )
 
-    def validate_request(
-        self, request: HttpRequest, raise_validation_error=True
-    ) -> bool:
+    def validate_request(self, request: HttpRequest, raise_validation_error=True) -> bool:
         if self.hmac_is_active:
-            return self.SENDER_HMAC_VALIDATORS[self.request_sender](
-                request=request, webhook_object=self
-            ).is_valid(raise_validation_error=raise_validation_error)
+            return self.SENDER_HMAC_VALIDATORS[self.request_sender](request=request, webhook_object=self).is_valid(
+                raise_validation_error=raise_validation_error
+            )
 
         return True
 
@@ -310,13 +287,9 @@ class RoleWebhook(ReceivedWebhook):
 
     UNITS_OF_DURATION = [(HOUR, "Час"), (DAY, "День"), (WEEK, "Неделя")]
 
-    servers = models.ManyToManyField(
-        Server, verbose_name="Сервера на которых будут выданы роли"
-    )
+    servers = models.ManyToManyField(Server, verbose_name="Сервера на которых будут выданы роли")
 
-    roles = models.ManyToManyField(
-        Role, verbose_name="Роли которые будут выданы на серверах"
-    )
+    roles = models.ManyToManyField(Role, verbose_name="Роли которые будут выданы на серверах")
 
     unit_of_duration = models.CharField(
         "Единица измерения продолжительности",
@@ -328,10 +301,7 @@ class RoleWebhook(ReceivedWebhook):
     allow_custom_duration_until_end = models.BooleanField(
         "Разрешено ли в запросе устанавливать продолжительность полномочий",
         default=False,
-        help_text=(
-            "Если активно - в запросе можно передать число, время на "
-            "которое будет выдана роль"
-        ),
+        help_text=("Если активно - в запросе можно передать число, время на которое будет выдана роль"),
     )
 
     duration_until_end = models.IntegerField(
@@ -339,8 +309,7 @@ class RoleWebhook(ReceivedWebhook):
     )
 
     active_and_increase_common_date_of_end = models.BooleanField(
-        "Активировать пользователя и увеличивать общее время "
-        "до окончания полномочий",
+        "Активировать пользователя и увеличивать общее время до окончания полномочий",
         default=True,
         help_text=(
             "Если время до общего окончания полномочий меньше времени "

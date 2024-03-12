@@ -29,18 +29,12 @@ def send_messages_to_discord(
                 discord_webhook.execute()
                 last_error = None
             except Timeout as e:
-                logging.warning(
-                    f'Timeout when send message "{text}" to discord'
-                )
+                logging.warning(f'Timeout when send message "{text}" to discord')
                 last_error = e
             except ConnectionError as e:
-                logging.warning(
-                    f'Connection error when send message "{text}" to discord'
-                )
+                logging.warning(f'Connection error when send message "{text}" to discord')
                 last_error = e
             break
 
         if last_error is not None:
-            logging.error(
-                "Ошибка при отправке сообщения в дискорд", exc_info=last_error
-            )
+            logging.error("Ошибка при отправке сообщения в дискорд", exc_info=last_error)

@@ -62,9 +62,7 @@ class DistributionModel(models.Model):
                 fields=["local_filename"],
                 condition=Q(local_filename__isnull=False),
                 name="%(app_label)s_%(class)s_distribution_local_filename_unique",
-                violation_error_message=(
-                    "Название локального файла должно быть уникальным"
-                ),
+                violation_error_message=("Название локального файла должно быть уникальным"),
             ),
             models.UniqueConstraint(
                 fields=["url"],
@@ -76,29 +74,17 @@ class DistributionModel(models.Model):
 
     def clean(self):
         errors = {}
-        if (
-            self.type_of_distribution in self.TYPES_OF_DISTRIBUTION_WITH_API
-            and not self.url
-        ):
+        if self.type_of_distribution in self.TYPES_OF_DISTRIBUTION_WITH_API and not self.url:
             errors["url"] = "Введите url"
 
-        if (
-            self.type_of_distribution in self.TYPES_OF_DISTRIBUTION_WITH_LOCAL
-            and not self.local_filename
-        ):
+        if self.type_of_distribution in self.TYPES_OF_DISTRIBUTION_WITH_LOCAL and not self.local_filename:
             errors["local_filename"] = "Введите имя файла"
 
         if errors:
             raise ValidationError(errors)
 
-        if (
-            self.type_of_distribution
-            not in self.TYPES_OF_DISTRIBUTION_WITH_API
-        ):
+        if self.type_of_distribution not in self.TYPES_OF_DISTRIBUTION_WITH_API:
             self.url = None
 
-        if (
-            self.type_of_distribution
-            not in self.TYPES_OF_DISTRIBUTION_WITH_LOCAL
-        ):
+        if self.type_of_distribution not in self.TYPES_OF_DISTRIBUTION_WITH_LOCAL:
             self.local_filename = None
