@@ -76,22 +76,20 @@ class RoleWebhookView(GenericAPIView):
             )
             raise ValidationError(serializer.errors)
 
-        if webhook.allow_custom_duration_until_end:
-            duration = serializer.validated_data["duration_until_end"] or webhook.duration_until_end
-            date_of_end = timezone.now() + timedelta(**{webhook.unit_of_duration: duration})
-        else:
-            date_of_end = timezone.now() + timedelta(**{webhook.unit_of_duration: webhook.duration_until_end})
+        date_of_end = self._calc_date_of_end(webhook, serializer)
 
         with transaction.atomic():
+            priv_defaults = {
+                "name": serializer.validated_data["name"],
+                "description": serializer.validated_data["comment"],
+            }
+
+            if webhook.set_common_date_of_end:
+                priv_defaults["date_of_end"] = date_of_end
+
             priv, created = Privileged.objects.get_or_create(
                 steam_id=serializer.validated_data["steam_id"],
-                defaults=(
-                    {
-                        "name": serializer.validated_data["name"],
-                        "description": serializer.validated_data["comment"],
-                        "date_of_end": date_of_end,
-                    }
-                ),
+                defaults=priv_defaults,
             )
 
             if not created and webhook.active_and_increase_common_date_of_end:
@@ -126,6 +124,18 @@ class RoleWebhookView(GenericAPIView):
             )
 
         return Response(data={"detail": "Created"})
+
+    def _calc_date_of_end(self, webhook: RoleWebhook, serializer: RoleWebhookSerializer):
+        duration: int
+
+        if webhook.allow_custom_duration_until_end and serializer.validated_data["duration_until_end"]:
+            duration = serializer.validated_data["duration_until_end"]
+        elif webhook.duration_until_end is not None:
+            duration = webhook.duration_until_end
+        else:
+            return None
+
+        return timezone.now() + timedelta(**{webhook.unit_of_duration: duration})
 
 
 class ServerConfigView(APIView):
