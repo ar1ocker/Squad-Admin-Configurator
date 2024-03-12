@@ -17,21 +17,13 @@ class GetCurrentRotationConfig(APIView):
     @extend_schema(
         methods=["get"],
         responses={
-            (200, "text/plain;charset=UTF-8"): OpenApiResponse(
-                OpenApiTypes.STR, description="Текст ротации"
-            ),
-            404: OpenApiResponse(
-                OpenApiTypes.JSON_PTR, description="Ротация не найдена"
-            ),
-            403: OpenApiResponse(
-                OpenApiTypes.JSON_PTR, description="Ротация не активна"
-            ),
+            (200, "text/plain;charset=UTF-8"): OpenApiResponse(OpenApiTypes.STR, description="Текст ротации"),
+            404: OpenApiResponse(OpenApiTypes.JSON_PTR, description="Ротация не найдена"),
+            403: OpenApiResponse(OpenApiTypes.JSON_PTR, description="Ротация не активна"),
         },
     )
     def get(self, request, url: str) -> HttpResponse | Response:
-        distrib = get_object_or_404(
-            RotationDistribution.objects.select_related("rotation"), url=url
-        )
+        distrib = get_object_or_404(RotationDistribution.objects.select_related("rotation"), url=url)
 
         if distrib.is_active:
             return HttpResponse(
@@ -50,17 +42,13 @@ class GetNextRotationConfig(APIView):
     @extend_schema(
         methods=["get"],
         responses={
-            (200, "text/plain;charset=UTF-8"): OpenApiResponse(
-                OpenApiTypes.STR, "Текст ротации"
-            ),
+            (200, "text/plain;charset=UTF-8"): OpenApiResponse(OpenApiTypes.STR, "Текст ротации"),
             404: OpenApiResponse(OpenApiTypes.JSON_PTR, "Ротация не найдена"),
             403: OpenApiResponse(OpenApiTypes.JSON_PTR, "Ротация не активна"),
         },
     )
     def get(self, request, url: str) -> HttpResponse | Response:
-        distrib = get_object_or_404(
-            RotationDistribution.objects.select_related("rotation"), url=url
-        )
+        distrib = get_object_or_404(RotationDistribution.objects.select_related("rotation"), url=url)
 
         if distrib.is_active:
             return HttpResponse(

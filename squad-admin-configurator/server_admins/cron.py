@@ -15,9 +15,7 @@ class DisablingServerPrivilegedByEndTime(CronJobBase):
 
     def do(self) -> None:
         server_privileges = (
-            ServerPrivileged.objects.filter(
-                date_of_end__lt=timezone.now(), is_active=True
-            )
+            ServerPrivileged.objects.filter(date_of_end__lt=timezone.now(), is_active=True)
             .exclude(date_of_end=None)
             .select_related("server", "privileged")
             .prefetch_related("roles")
@@ -36,9 +34,7 @@ class DisablingServerPrivilegedByEndTime(CronJobBase):
 
         messages: list[str] = []
         for server_priv in server_privileges:
-            roles_text: str = ", ".join(
-                [role.title for role in server_priv.roles.all()]
-            )
+            roles_text: str = ", ".join([role.title for role in server_priv.roles.all()])
 
             messages.append(
                 f"{settings.BASE_URL}"
@@ -49,9 +45,7 @@ class DisablingServerPrivilegedByEndTime(CronJobBase):
                 f"{server_priv.server.title} - {roles_text}"
             )
 
-        send_messages_to_discord(
-            EXPIRED_PRIVILEGED_CHAT["CHAT_WEBHOOK"], "Админ панель", messages
-        )
+        send_messages_to_discord(EXPIRED_PRIVILEGED_CHAT["CHAT_WEBHOOK"], "Админ панель", messages)
 
 
 class DisablingPrivilegedByEndTime(CronJobBase):
@@ -60,13 +54,9 @@ class DisablingPrivilegedByEndTime(CronJobBase):
 
     def do(self):
         privileges = (
-            Privileged.objects.filter(
-                date_of_end__lt=timezone.now(), is_active=True
-            )
+            Privileged.objects.filter(date_of_end__lt=timezone.now(), is_active=True)
             .exclude(date_of_end=None)
-            .prefetch_related(
-                "serverprivileged_set__roles", "serverprivileged_set__server"
-            )
+            .prefetch_related("serverprivileged_set__roles", "serverprivileged_set__server")
         )
 
         for priv in privileges:
@@ -84,13 +74,9 @@ class DisablingPrivilegedByEndTime(CronJobBase):
         for priv in privileges:
             all_roles_text = []
             for server_roles in priv.serverprivileged_set.all():
-                roles_text = ", ".join(
-                    [role.title for role in server_roles.roles.all()]
-                )
+                roles_text = ", ".join([role.title for role in server_roles.roles.all()])
 
-                all_roles_text.append(
-                    f"{server_roles.server.title} - {roles_text};"
-                )
+                all_roles_text.append(f"{server_roles.server.title} - {roles_text};")
 
             messages.append(
                 f"{settings.BASE_URL}{reverse_to_admin_edit(priv)}\n"
@@ -98,6 +84,4 @@ class DisablingPrivilegedByEndTime(CronJobBase):
                 "Истекли все полномочия:\n" + " ".join(all_roles_text)
             )
 
-        send_messages_to_discord(
-            EXPIRED_PRIVILEGED_CHAT["CHAT_WEBHOOK"], "Админ панель", messages
-        )
+        send_messages_to_discord(EXPIRED_PRIVILEGED_CHAT["CHAT_WEBHOOK"], "Админ панель", messages)

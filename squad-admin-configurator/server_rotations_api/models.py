@@ -15,12 +15,8 @@ class RotationDistribution(DistributionModel):
         verbose_name="Ротация",
         related_name="distributions",
     )
-    last_update_date = models.DateTimeField(
-        "Дата последнего обновления", blank=True, null=True
-    )
-    last_queue_number = models.PositiveSmallIntegerField(
-        "Последний номер в очереди", default=1
-    )
+    last_update_date = models.DateTimeField("Дата последнего обновления", blank=True, null=True)
+    last_queue_number = models.PositiveSmallIntegerField("Последний номер в очереди", default=1)
 
     class Meta(DistributionModel.Meta):
         verbose_name = "распространение ротации"
@@ -43,8 +39,7 @@ class RotationDistribution(DistributionModel):
                 "-start_date",
             )
             .filter(
-                Q(queue_number__gt=self.last_queue_number)
-                | Q(start_date=timezone.now() + timedelta(days=1)),
+                Q(queue_number__gt=self.last_queue_number) | Q(start_date=timezone.now() + timedelta(days=1)),
                 rotation=self.rotation,
             )
             .first()
@@ -67,8 +62,7 @@ class RotationDistribution(DistributionModel):
                 "-start_date",
             )
             .filter(
-                Q(queue_number=self.last_queue_number)
-                | Q(start_date=timezone.now().date()),
+                Q(queue_number=self.last_queue_number) | Q(start_date=timezone.now().date()),
                 pack__is_active=True,
                 rotation=self.rotation,
             )

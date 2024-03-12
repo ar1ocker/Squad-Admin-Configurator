@@ -6,11 +6,7 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import (
-    OpenApiExample,
-    OpenApiResponse,
-    extend_schema,
-)
+from drf_spectacular.utils import OpenApiExample, OpenApiResponse, extend_schema
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import GenericAPIView
@@ -19,13 +15,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
-from server_admins.models import (
-    Permission,
-    Privileged,
-    Role,
-    Server,
-    ServerPrivileged,
-)
+from server_admins.models import Permission, Privileged, Role, Server, ServerPrivileged
 
 from .models import AdminsConfigDistribution, RoleWebhook, WebhookLog
 from .serializers import (
@@ -87,17 +77,10 @@ class RoleWebhookView(GenericAPIView):
             raise ValidationError(serializer.errors)
 
         if webhook.allow_custom_duration_until_end:
-            duration = (
-                serializer.validated_data["duration_until_end"]
-                or webhook.duration_until_end
-            )
-            date_of_end = timezone.now() + timedelta(
-                **{webhook.unit_of_duration: duration}
-            )
+            duration = serializer.validated_data["duration_until_end"] or webhook.duration_until_end
+            date_of_end = timezone.now() + timedelta(**{webhook.unit_of_duration: duration})
         else:
-            date_of_end = timezone.now() + timedelta(
-                **{webhook.unit_of_duration: webhook.duration_until_end}
-            )
+            date_of_end = timezone.now() + timedelta(**{webhook.unit_of_duration: webhook.duration_until_end})
 
         with transaction.atomic():
             priv, created = Privileged.objects.get_or_create(
@@ -117,10 +100,7 @@ class RoleWebhookView(GenericAPIView):
                     priv.is_active = True
                     need_save = True
 
-                if (
-                    priv.date_of_end is not None
-                    and priv.date_of_end < date_of_end
-                ):
+                if priv.date_of_end is not None and priv.date_of_end < date_of_end:
                     priv.date_of_end = date_of_end
                     need_save = True
 
@@ -159,9 +139,7 @@ class ServerConfigView(APIView):
     @extend_schema(
         methods=["get"],
         responses={
-            (200, "text/plain;charset=UTF-8"): OpenApiResponse(
-                OpenApiTypes.STR, "Текст конфига сервера"
-            ),
+            (200, "text/plain;charset=UTF-8"): OpenApiResponse(OpenApiTypes.STR, "Текст конфига сервера"),
             404: OpenApiResponse(OpenApiTypes.JSON_PTR, "Сервер не найден"),
             403: OpenApiResponse(OpenApiTypes.JSON_PTR, "Сервер не активен"),
         },
@@ -208,13 +186,9 @@ class RoleViewSet(ModelViewSet):
     def get_queryset(self):
         base_manager = Role.objects.prefetch_related("permissions")
 
-        server_privileges_pk: str | None = self.kwargs.get(
-            "server_privileges_pk"
-        )
+        server_privileges_pk: str | None = self.kwargs.get("server_privileges_pk")
         if server_privileges_pk:
-            return base_manager.filter(
-                serverprivileged=server_privileges_pk
-            ).all()
+            return base_manager.filter(serverprivileged=server_privileges_pk).all()
 
         return base_manager.all()
 
@@ -228,9 +202,7 @@ class RoleViewSet(ModelViewSet):
 class PrivilegedViewSet(ModelViewSet):
     """View set для доступа к привилегированным пользователям"""
 
-    queryset = Privileged.objects.prefetch_related(
-        "serverprivileged_set__roles", "serverprivileged_set__server"
-    ).all()
+    queryset = Privileged.objects.prefetch_related("serverprivileged_set__roles", "serverprivileged_set__server").all()
     serializer_class = PrivilegedSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["name", "steam_id", "is_active"]
@@ -244,9 +216,7 @@ class ServerPrivilegedViewSet(ModelViewSet):
     filterset_fields = ["server", "privileged", "roles", "is_active"]
 
     def get_queryset(self):
-        base_manager = ServerPrivileged.objects.prefetch_related(
-            "roles"
-        ).select_related("server")
+        base_manager = ServerPrivileged.objects.prefetch_related("roles").select_related("server")
 
         privileged_pk: str | None = self.kwargs.get("privileged_pk")
         if privileged_pk:

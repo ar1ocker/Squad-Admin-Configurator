@@ -12,11 +12,7 @@ from rest_framework.validators import ValidationError
 if TYPE_CHECKING:
     from .models import ReceivedWebhook
 
-BM_MAX_DEVIATION = timedelta(
-    seconds=settings.HMAC_VALIDATION["BATTLEMETRICS"][
-        "MAX_DEVIATION_OF_TIMESTAMP_IN_SEC"
-    ]
-)
+BM_MAX_DEVIATION = timedelta(seconds=settings.HMAC_VALIDATION["BATTLEMETRICS"]["MAX_DEVIATION_OF_TIMESTAMP_IN_SEC"])
 
 
 class NotValidatedError(Exception):
@@ -28,9 +24,7 @@ class BaseRequestHMACValidator(ABC):
     Абстрактный класс валидатора HMAC в запросе
     """
 
-    def __init__(
-        self, request: Request, webhook_object: "ReceivedWebhook"
-    ) -> None:
+    def __init__(self, request: Request, webhook_object: "ReceivedWebhook") -> None:
         self.request: Request = request
         self.webhook_object: "ReceivedWebhook" = webhook_object
 
@@ -51,9 +45,7 @@ class BaseRequestHMACValidator(ABC):
         if self._validate:
             return self._error
 
-        raise NotValidatedError(
-            "Before receiving errors, you need to call the is_valid() method"
-        )
+        raise NotValidatedError("Before receiving errors, you need to call the is_valid() method")
 
     def is_valid(self, raise_validation_error=True) -> bool:
         """Проверяет валиден ли запрос по отношению к вебхуку
@@ -99,9 +91,7 @@ class BaseRequestHMACValidator(ABC):
         Returns:
             str: Сигнатура
         """
-        raise NotImplementedError(
-            "get_signature_from_request is not implemented"
-        )
+        raise NotImplementedError("get_signature_from_request is not implemented")
 
     @abstractmethod
     def generate_signature_from_request(self) -> str:
@@ -113,9 +103,7 @@ class BaseRequestHMACValidator(ABC):
         Returns:
             str: Сигнатура
         """
-        raise NotImplementedError(
-            "generate_signature_from_request is not implemented"
-        )
+        raise NotImplementedError("generate_signature_from_request is not implemented")
 
     def compare_signature(self, sign_1, sign_2) -> bool:
         """Сравнивает две сигнатура через функцию с постоянным временем
@@ -152,13 +140,8 @@ class DefaultRequestHMACValidator(BaseRequestHMACValidator):
 
         generated_signature: str = self.generate_signature_from_request()
 
-        if not self.compare_signature(
-            signature_from_request, generated_signature
-        ):
-            raise ValidationError(
-                "Request body, signature or secret key is corrupted, "
-                "hmac does not match"
-            )
+        if not self.compare_signature(signature_from_request, generated_signature):
+            raise ValidationError("Request body, signature or secret key is corrupted, hmac does not match")
 
     def get_signature_from_request(self) -> str | None:
         header = self.request.headers[self.webhook_object.hmac_header]
@@ -195,9 +178,7 @@ class BattlemetricsRequestHMACValidator(DefaultRequestHMACValidator):
         now: datetime = datetime.now(timezone.utc)
         header = self.request.headers[self.webhook_object.hmac_header]
 
-        timestamp_match = re.search(
-            r"(?<=t=)[\w\-:.+]+(?=,|\Z)", header, flags=re.A
-        )
+        timestamp_match = re.search(r"(?<=t=)[\w\-:.+]+(?=,|\Z)", header, flags=re.A)
 
         if timestamp_match is None:
             raise ValidationError("Timestamp in HMAC header not found")
@@ -207,20 +188,13 @@ class BattlemetricsRequestHMACValidator(DefaultRequestHMACValidator):
         try:
             timestamp = datetime_isoparse(timestamp_text)
         except ValueError:
-            raise ValidationError(
-                "Timestamp in HMAC header have not valid format, required iso"
-                " format"
-            )
+            raise ValidationError("Timestamp in HMAC header have not valid format, required iso" " format")
 
         if timestamp.tzinfo is None:
-            raise ValidationError(
-                "Timestamp in HMAC header must have a timezone"
-            )
+            raise ValidationError("Timestamp in HMAC header must have a timezone")
 
         if not (now - BM_MAX_DEVIATION < timestamp < now + BM_MAX_DEVIATION):
-            raise ValidationError(
-                "Timestamp is very old or very far in the future"
-            )
+            raise ValidationError("Timestamp is very old or very far in the future")
 
         return hmac.digest(
             self.webhook_object.hmac_secret_key.encode(),

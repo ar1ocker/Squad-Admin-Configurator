@@ -14,9 +14,7 @@ class CreateRotationsFiles(CronJobBase):
     def do(self):
         now = timezone.now()
         local_types = RotationDistribution.TYPES_OF_DISTRIBUTION_WITH_LOCAL
-        rot_distributions = RotationDistribution.objects.select_related(
-            "rotation"
-        ).filter(
+        rot_distributions = RotationDistribution.objects.select_related("rotation").filter(
             ~Q(last_update_date__date=now),
             is_active=True,
             type_of_distribution__in=local_types,

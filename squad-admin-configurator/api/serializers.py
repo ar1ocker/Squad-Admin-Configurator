@@ -1,12 +1,6 @@
 from drf_queryfields import QueryFieldsMixin
 from rest_framework import serializers
-from server_admins.models import (
-    Permission,
-    Privileged,
-    Role,
-    Server,
-    ServerPrivileged,
-)
+from server_admins.models import Permission, Privileged, Role, Server, ServerPrivileged
 
 from .models import WebhookLog
 
@@ -39,18 +33,14 @@ class RoleSerializer(QueryFieldsMixin, serializers.ModelSerializer):
 
 
 class RoleSerializerWrite(serializers.ModelSerializer):
-    permissions = serializers.PrimaryKeyRelatedField(
-        queryset=Permission.objects.all(), many=True, allow_null=True
-    )
+    permissions = serializers.PrimaryKeyRelatedField(queryset=Permission.objects.all(), many=True, allow_null=True)
 
     class Meta:
         model = Role
         fields = "__all__"
 
 
-class ServerPrivilegedSerializer(
-    QueryFieldsMixin, serializers.ModelSerializer
-):
+class ServerPrivilegedSerializer(QueryFieldsMixin, serializers.ModelSerializer):
     roles = RoleSerializer(many=True, read_only=True)
     server = ServerSerializer(read_only=True)
 
@@ -60,9 +50,7 @@ class ServerPrivilegedSerializer(
 
 
 class ServerPrivilegedSerializerWrite(serializers.ModelSerializer):
-    roles = serializers.PrimaryKeyRelatedField(
-        queryset=Role.objects.all(), many=True, allow_null=True
-    )
+    roles = serializers.PrimaryKeyRelatedField(queryset=Role.objects.all(), many=True, allow_null=True)
     server = serializers.PrimaryKeyRelatedField(queryset=Server.objects.all())
 
     class Meta:
@@ -71,9 +59,7 @@ class ServerPrivilegedSerializerWrite(serializers.ModelSerializer):
 
 
 class PrivilegedSerializer(QueryFieldsMixin, serializers.ModelSerializer):
-    servers_roles = ServerPrivilegedSerializer(
-        source="serverprivileged_set", many=True, read_only=True
-    )
+    servers_roles = ServerPrivilegedSerializer(source="serverprivileged_set", many=True, read_only=True)
 
     class Meta:
         model = Privileged
