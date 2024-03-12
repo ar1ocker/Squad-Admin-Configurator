@@ -23,7 +23,7 @@ class RotationDistribution(DistributionModel):
         verbose_name_plural = "распространение ротаций"
         ordering = ["rotation"]
 
-    def get_next_pack(self) -> RotationLayersPack:
+    def get_next_pack(self) -> RotationLayersPack | None:
         """Получает следующий конфиг в очереди"""
 
         prefetched_pack = (
@@ -53,7 +53,7 @@ class RotationDistribution(DistributionModel):
 
         return pack_m2m
 
-    def get_current_pack(self) -> RotationLayersPack:
+    def get_current_pack(self) -> RotationLayersPack | None:
         pack_m2m = (
             RotationLayersPack.objects.select_related("pack")
             .prefetch_related("pack__layers_through__layer")

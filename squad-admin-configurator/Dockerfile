@@ -17,7 +17,7 @@ COPY ./ ./
 RUN mkdir static
 RUN chmod -R o+x static
 
-RUN python3 manage.py collectstatic --noinput
+RUN python3 manage.py collectstatic --noinput --clear
 RUN python3 manage.py makemigrations --noinput
 
 RUN chmod +x start.sh

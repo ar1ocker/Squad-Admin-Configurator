@@ -34,7 +34,8 @@ class CreateRotationsFiles(CronJobBase):
                     file.write(distrib.format_config(pack))
 
                 distrib.last_update_date = now
-                if pack.queue_number is not None:
+
+                if pack and pack.queue_number is not None:
                     distrib.last_queue_number = pack.queue_number
 
                 distrib.save()

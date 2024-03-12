@@ -188,7 +188,7 @@ class BattlemetricsRequestHMACValidator(DefaultRequestHMACValidator):
         try:
             timestamp = datetime_isoparse(timestamp_text)
         except ValueError:
-            raise ValidationError("Timestamp in HMAC header have not valid format, required iso" " format")
+            raise ValidationError("Timestamp in HMAC header have not valid format, required iso format")
 
         if timestamp.tzinfo is None:
             raise ValidationError("Timestamp in HMAC header must have a timezone")
