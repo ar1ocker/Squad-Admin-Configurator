@@ -75,8 +75,15 @@ class ServerPrivilegedAdmin(admin.ModelAdmin):
     list_display_links = ("privileged", "server")
     list_editable = ("is_active",)
     list_filter = (
+        (
+            "server__title",
+            custom_titled_filter("Название сервера"),
+        ),
+        (
+            "privileged__is_active",
+            custom_titled_filter("Пользователь активирован"),
+        ),
         "is_active",
-        "privileged__is_active",
         "roles",
         "date_of_end",
         "creation_date",
