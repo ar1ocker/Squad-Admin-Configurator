@@ -8,21 +8,20 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('django_cron', '0004_alter_cronjoblock_id_alter_cronjoblog_id'),
+        ("django_cron", "0003_cronjoblock"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='CronJobLog',
-            fields=[
-            ],
+            name="CronJobLog",
+            fields=[],
             options={
-                'verbose_name': 'Лог',
-                'verbose_name_plural': '1. Логи',
-                'proxy': True,
-                'indexes': [],
-                'constraints': [],
+                "verbose_name": "Лог",
+                "verbose_name_plural": "1. Логи",
+                "proxy": True,
+                "indexes": [],
+                "constraints": [],
             },
-            bases=('django_cron.cronjoblog',),
+            bases=("django_cron.cronjoblog",),
         ),
     ]
