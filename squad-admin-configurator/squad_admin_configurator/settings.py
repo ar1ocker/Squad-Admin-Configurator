@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     "server_admins.apps.ServerAdminsConfig",
     "api.apps.ApiConfig",
     "django_cron",
+    "django_cron_proxy.apps.DjangoCronProxyConfig",
     "drf_spectacular",
 ]
 

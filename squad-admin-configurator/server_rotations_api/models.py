@@ -20,7 +20,7 @@ class RotationDistribution(DistributionModel):
 
     class Meta(DistributionModel.Meta):
         verbose_name = "распространение ротации"
-        verbose_name_plural = "распространение ротаций"
+        verbose_name_plural = "1. Распространение ротаций"
         ordering = ["rotation"]
 
     def get_next_pack(self) -> RotationLayersPack | None:

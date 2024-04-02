@@ -87,8 +87,8 @@ class Permission(models.Model):
         return self.title
 
     class Meta:
-        verbose_name = "Разрешение игрового сервера"
-        verbose_name_plural = "4. Разрешения игрового сервера"
+        verbose_name = "Разрешение"
+        verbose_name_plural = "4. Разрешения"
 
 
 class Role(models.Model):
@@ -106,8 +106,8 @@ class Role(models.Model):
         return self.title
 
     class Meta:
-        verbose_name = "Пользовательская роль"
-        verbose_name_plural = "3. Пользовательские роли"
+        verbose_name = "Роль"
+        verbose_name_plural = "3. Роли"
 
 
 class Privileged(models.Model):
@@ -134,8 +134,8 @@ class Privileged(models.Model):
         return f"{self.name}"
 
     class Meta:
-        verbose_name = "Привилегированный пользователь"
-        verbose_name_plural = "2. Привилегированные пользователи"
+        verbose_name = "Пользователь"
+        verbose_name_plural = "2. Пользователи"
 
     def clean(self) -> None:
         self.name = re.sub(r"\s", " ", self.name)

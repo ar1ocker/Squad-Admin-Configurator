@@ -259,8 +259,8 @@ class AdminsConfigDistribution(DistributionModel):
     )
 
     class Meta(DistributionModel.Meta):
-        verbose_name = "Доступ к файлу конфигурации"
-        verbose_name_plural = "2. Доступ к файлу конфигурации"
+        verbose_name = "Распространение конфигурации"
+        verbose_name_plural = "2. Распространение конфигураций"
 
 
 class RoleWebhook(ReceivedWebhook):
@@ -305,9 +305,10 @@ class RoleWebhook(ReceivedWebhook):
     )
 
     duration_until_end = models.IntegerField(
-        "Стандартно выдаваемая продолжительность полномочий, оставьте пустым для бессрочных полномочий",
+        "Стандартно выдаваемая продолжительность полномочий",
         null=True,
         blank=True,
+        help_text="Оставьте пустым для бессрочных полномочий",
     )
 
     set_common_date_of_end = models.BooleanField(
