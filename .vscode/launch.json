@@ -2,10 +2,9 @@
     "configurations": [
         {
            "name": "Attach to Squad-Admin-Configurator",
-           "type": "python",
+           "type": "debugpy",
            "request": "attach",
-           "port": 5678,
-           "host": "localhost",
+           "connect": {"port": 5678, "host": "127.0.0.1"},
            "pathMappings": [
                {
                    "localRoot": "${workspaceFolder}/squad-admin-configurator",
