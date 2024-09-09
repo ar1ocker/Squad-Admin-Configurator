@@ -1,5 +1,7 @@
 # **⭐ Пригодилось? Звездочку поставь. ⭐**
 
+❗❗❗**С 09.2024 проект находится в замороженном состоянии, выпускаются только исправления безопасности. Если вам нужны какие-то новые фичи - делайте форк или пишите в Telegram [https://t.me/sac_help_bot](https://t.me/sac_help_bot)**
+
 # Squad Admin Configurator
 
 ![изображение](https://github.com/ar1ocker/Squad-Admin-Configurator/assets/109543340/31d49ad5-d966-4a8b-aa95-3c9195c3daba)
