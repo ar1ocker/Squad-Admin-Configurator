@@ -3,6 +3,7 @@ version: '3.8'
 services:
   db:
     image: postgres:15.4-bookworm
+    restart: always
     volumes:
       - postgres_value:/var/lib/postgresql/data/
     env_file:
@@ -20,6 +21,7 @@ services:
       - ./.env
   nginx:
     image: nginx:alpine
+    restart: always
     ports:
       - 443:443
     volumes:
