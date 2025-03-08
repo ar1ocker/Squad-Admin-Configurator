@@ -1,7 +1,7 @@
 [ADMIN_SITE]
 # Заголовки в шапке админки
 # просто текст
-ADMIN_SITE_HEADER = "Squad Configurator"
+ADMIN_SITE_HEADER = "Squad Admin Configurator"
 ADMIN_SITE_TITLE = "Управление привилегированными пользователями"
 ADMIN_INDEX_TITLE = "Squad Admin Configurator"
 
@@ -24,6 +24,11 @@ DEBUG = false
 # для него необходимо задать переменные окружения
 # POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD, DB_HOST, DB_PORT
 SQLITE = false
+POSTGRES_DB = ''
+POSTGRES_USER = ''
+POSTGRES_PASSWORD = ''
+POSTGRES_HOST = 'db'
+POSTGRES_PORT = 5432
 
 # IP или домен под которым будет работать ваш сайт, указывать без порта и 
 # протокола, при запросе сайта с другим заголовком host в запросе - конфигуратор не ответит

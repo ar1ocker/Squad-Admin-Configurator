@@ -1,0 +1,74 @@
+[ADMIN_SITE]
+# Заголовки в шапке админки
+# просто текст
+ADMIN_SITE_HEADER = "Squad Admin Configurator"
+ADMIN_SITE_TITLE = "Управление привилегированными пользователями"
+ADMIN_INDEX_TITLE = "Squad Admin Configurator"
+
+[SERVER]
+# Базовый IP или домен, используется для генерации ссылки на страницу конфигуратора
+# когда реквест недоступен.
+# указывать без слеша в конце
+# например: http://127.0.0.1
+BASE_URL = ""
+
+[DJANGO]
+# Секретный ключ в django, просто текст, ставьте длинным, рандомным и не теряйте,
+# потеряете - придётся менять все пароли, ибо по старым зайти не получиться
+SECRET_KEY = ""
+
+# Вывод дебаг информации при ошибках, true или false, true использовать только при разработке
+DEBUG = false
+
+# Использовать ли Sqlite, true или false, при false используется Postgresql,
+# для него необходимо задать переменные окружения
+# POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD, DB_HOST, DB_PORT
+SQLITE = false
+POSTGRES_DB = ''
+POSTGRES_USER = ''
+POSTGRES_PASSWORD = ''
+POSTGRES_HOST = 'db'
+POSTGRES_PORT = 5432
+
+# IP или домен под которым будет работать ваш сайт, указывать без порта и 
+# протокола, при запросе сайта с другим заголовком host в запросе - конфигуратор не ответит
+ALLOWED_HOSTS = ['example.com']
+
+# Источники запросов, которые будет проверять сайт, указывать с портом и протоколом
+CSRF_TRUSTED_ORIGINS = ['http://example.com:1002/', 'https://example.com:1002/']
+
+[DISCORD]
+[DISCORD.EXPIRED_PRIVILEGED_CHAT]
+# Отправлять ли истекшие привилегии в дискорд, true или false
+ENABLE = false
+
+# Вебхук чата, в который будут отправлены истекшие админки, вебхук можно 
+# получить в настройках канала в Discord
+CHAT_WEBHOOK = ''
+
+[HMAC_VALIDATION]
+[HMAC_VALIDATION.BATTLEMETRICS]
+# Максимальная погрешность в секундах при которой запрос пришедший на вебхук
+# от BM будет считаться валидным, погрешность учитывается и в одну и в другую сторону
+# Например:
+# T время запроса
+# D погрешность
+# T - D < T < T + D
+#
+# т.е. при D == 10 - фактически подписанному запросу нужно будет попасть в 20 
+# секундный интервал
+MAX_DEVIATION_OF_TIMESTAMP_IN_SEC = 10
+
+[ADMINS]
+# Каталог внутри squad-admin-configurator в который будут
+# складываться сгенерированные конфиги администраторов
+ADMINS_CONFIG_DIR = 'admins_configs'
+
+[ROTATIONS]
+# Каталог внутри squad-admin-configurator в который будут складываться
+# конфиги для ротаций
+ROTATIONS_CONFIG_DIR = 'rotations_configs'
+
+[CRON]
+# Количество дней через которые будут удаляться логи об выполнении cron
+DELETE_LOGS_OLDER_THAN = 90

@@ -3,6 +3,8 @@ rotations/
 static/
 admins_configs/
 rotations_configs/
+postgres.env
+
 .VSCodeCounter/
 
 .vscode/
