@@ -1,38 +1,91 @@
-version: '3.8'
+
+name: squad-admin-configurator-dev
 
 services:
+  squad-admin-configurator-migrations:
+    build: ../squad-admin-configurator/
+    command: ["./migrations.sh"]
+    stop_signal: SIGINT
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - only-lan-network
+    configs:
+      - source: squad-admin-configurator
+        target: /app/config.toml
+
+  squad-admin-configurator:
+    build: ../squad-admin-configurator/
+    command: "sh -c 'pip3 install debugpy -t /tmp && python3 /tmp/debugpy --wait-for-client --listen 0.0.0.0:5678 manage.py runserver 0.0.0.0:8000 --insecure'"
+    ports:
+      - "8000:8000"
+      - "5678:5678"
+    develop:
+      watch:
+        - path: ./squad-admin-configurator
+          target: /app
+          action: sync
+    stop_signal: SIGINT
+    restart: always
+    volumes:
+      - static_value:/app/static
+      - /squad_admins_configs:/app/admins_configs
+      - /squad_rotations_configs:/app/rotations_configs
+    group_add:
+      - 110
+    depends_on:
+      squad-admin-configurator-migrations:
+        condition: service_completed_successfully
+    networks:
+      - only-lan-network
+      - to-wan-network
+    configs:
+      - source: squad-admin-configurator
+        target: /app/config.toml
+
+  squad-admin-configurator-cron:
+    build: ../squad-admin-configurator/
+    entrypoint: ""
+    command: ["python3", "manage.py", "cronloop", "-s", "300"]
+    stop_signal: SIGINT
+    restart: always
+    volumes:
+      - /squad_admins_configs:/app/admins_configs
+      - /squad_rotations_configs:/app/rotations_configs
+    depends_on:
+      - squad-admin-configurator
+    networks:
+      - only-lan-network
+    configs:
+      - source: squad-admin-configurator
+        target: /app/config.toml
+
   db:
     image: postgres:15.4-bookworm
     restart: always
     volumes:
-      - dev_postgres_value:/var/lib/postgresql/data/
+      - postgres_value:/var/lib/postgresql/data/
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - only-lan-network
     env_file:
-      - ./.env-dev
-  squad-admin-configurator:
-    build:
-      dockerfile: ../squad-admin-configurator/Dockerfile.dev
-      context: ../squad-admin-configurator/
-    restart: always
-    volumes:
-      - ../squad-admin-configurator:/app
-      - dev_static_value:/app/static
-    depends_on:
-      - db
-    env_file:
-      - ./.env-dev
-    ports:
-      - "5678:5678"
-  nginx:
-    image: nginx:alpine
-    restart: always
-    ports:
-      - "80:80"
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
-      - dev_static_value:/var/html/static
-    depends_on:
-      - squad-admin-configurator
+      - ./configs/postgres/postgres.env
 
 volumes:
-  dev_postgres_value:
-  dev_static_value:
+  postgres_value:
+  static_value:
+
+networks:
+  to-wan-network:
+  only-lan-network:
+
+configs:
+  squad-admin-configurator:
+    file: ./configs/squad-admin-configurator/config.toml
+  nginx:
+    file: ./configs/nginx/default.conf

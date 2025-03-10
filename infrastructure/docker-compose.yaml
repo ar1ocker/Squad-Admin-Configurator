@@ -55,7 +55,6 @@ services:
 
   squad-admin-configurator-cron:
     build: ../squad-admin-configurator/
-    entrypoint: ""
     command: ["python3", "manage.py", "cronloop", "-s", "300"]
     stop_signal: SIGINT
     restart: always
