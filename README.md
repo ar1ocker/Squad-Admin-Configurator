@@ -2,7 +2,7 @@
 
 # Squad Admin Configurator
 
-![изображение](https://github.com/ar1ocker/Squad-Admin-Configurator/assets/109543340/31d49ad5-d966-4a8b-aa95-3c9195c3daba)
+![изображение](https://github.com/user-attachments/assets/05410618-ef41-4634-8415-c231ff90ea80)
 
 Система управления привилегированными пользователями и ротациями карт для Squad
 
@@ -31,7 +31,36 @@
 - Роль - именованный набор игровых разрешений Squad
 - Разрешение - [разрешение на сервере Squad](https://squad.fandom.com/wiki/Server_Administration)
 - Ротация - набор паков с картами в определенном порядке
+- Списки пользователей - список пользователей с привязанными серверами и набором разрешений
 - Пак с картами - набор карт в определенном порядке
+
+## Как разрешить работать только с определенными "списками пользователей"
+
+- Создаем пользователя
+
+![изображение](https://github.com/user-attachments/assets/83a9734f-682f-4955-b7f3-728e07d88c93)
+
+- После того как задали пароль - заходим в пользователя и ставим разрешения
+
+![изображение](https://github.com/user-attachments/assets/b1b59bca-e745-463c-99b6-801fc6205836)
+
+- Создаем список и задаём ему пользователя, попутно конечно же заполняем сервера и роли
+
+![изображение](https://github.com/user-attachments/assets/3a79316a-977f-4b24-937a-d74c4fd1d822)
+
+- Бинго, теперь наш пользователь будет видеть сайт вот так
+
+![изображение](https://github.com/user-attachments/assets/a62dc2e8-6927-4f5d-a396-51b3a99cf081)
+
+- Видеть он будет только те списки в котором он назначен модератором (а их может быть неограниченное количество)
+
+![изображение](https://github.com/user-attachments/assets/363af7e0-fced-4d50-a2d8-ce90cf3a83c3)
+
+- А изменять сможет только сам список steam id
+
+![изображение](https://github.com/user-attachments/assets/400234ca-6037-4035-974a-b77fed518494)
+
+- Пароль от этого пользователя можно спокойно отдать человеку который будет отвечать у вас за добавление конкретных ролей на конкретные сервера
 
 ## Запуск и настройка
 
@@ -45,29 +74,28 @@
 
 Из папки **infrastructure/**
 
-- Поднимаем 3 контейнера: Postgresql, Nginx и Squad-Admin-Configurator. Также будут автоматически выполнены миграции. Сервис будет доступен по адресу **<ваш ip>:80/**
+- Поднимаем контейнеры. Сервис будет доступен по адресу **<ваш ip>:80/**
 ```
 # docker compose up -d
 ```
 
 - Создаём административный аккаунт на сайте
 ```
-# docker exec -it infrastructure-squad-admin-configurator-1 python3 manage.py createsuperuser
+# docker compose exec -it squad-admin-configurator python3 manage.py createsuperuser
 ```
-Для некоторых старых версий Docker - названии контейнера может быть таким **infrastructure_squad-admin-configurator_1**
 
 - При необходимости - импортируем уже существующий файл Admins.cfg с нашего сервера Squad
 ```
-# docker cp <путь до Admins.cfg> infrastructure-squad-admin-configurator-1:/
-# docker exec -it infrastructure-squad-admin-configurator-1 python3 manage.py load_admin_config /Admins.cfg
+# docker compose cp <путь до Admins.cfg> squad-admin-configurator:/
+# docker compose exec -it squad-admin-configurator python3 manage.py load_admin_config /Admins.cfg
 ```
 
 - По дефолту для локальных конфигураций админов Squad создается каталог **~/squad_admin_configs/** в хостовой системе
 
 - При необходимости - импортируем уже существующие паки с нашего сервера Squad
 ```
-# docker cp <путь до папки с паками> infrastructure-squad-admin-configurator-1:/
-# docker exec -it infrastructure-squad-admin-configurator-1 sh
+# docker cp <путь до папки с паками> squad-admin-configurator:/
+# docker exec -it squad-admin-configurator sh
 # python3 manage.py load_layer_pack /<папка с паками>/<пак>
 ```
 
@@ -123,8 +151,8 @@ python3 manage.py cronloop -s 300
 # TODO
 
 - Тесты
-- Ограничение персонала по добавлению определенных ролей на сервер
-- Форма быстрого добавления списка привилегированных пользователей в админ панели
+- (завершено 09.06.2025) Ограничение персонала по добавлению определенных ролей на сервер
+- (завершено 09.06.2025) Форма быстрого добавления списка привилегированных пользователей в админ панели
 - Форма быстрого добавления пака с картами в админ панели
 - Переводы
 - (завершено 09.02.2024) API для получения списка привилегированных пользователей
