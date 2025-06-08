@@ -23,7 +23,7 @@ services:
       - "5678:5678"
     develop:
       watch:
-        - path: ./squad-admin-configurator
+        - path: ../squad-admin-configurator
           target: /app
           action: sync
     stop_signal: SIGINT
@@ -67,7 +67,7 @@ services:
     volumes:
       - postgres_value:/var/lib/postgresql/data/
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
       interval: 5s
       timeout: 5s
       retries: 5

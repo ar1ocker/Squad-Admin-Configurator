@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "access",
     "rest_framework",
     "rest_framework.authtoken",
     "django_filters",
@@ -50,7 +51,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = "squad_admin_configurator.urls"
+ROOT_URLCONF = "settings.urls"
 
 TEMPLATES = [
     {
@@ -68,7 +69,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "squad_admin_configurator.wsgi.application"
+WSGI_APPLICATION = "settings.wsgi.application"
 
 if CONFIG["DJANGO"]["SQLITE"]:
     DATABASES = {
@@ -91,16 +92,16 @@ else:
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        "NAME": ("django.contrib.auth.password_validation.UserAttributeSimilarityValidator"),
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        "NAME": ("django.contrib.auth.password_validation.MinimumLengthValidator"),
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        "NAME": ("django.contrib.auth.password_validation.CommonPasswordValidator"),
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        "NAME": ("django.contrib.auth.password_validation.NumericPasswordValidator"),
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
@@ -139,6 +140,7 @@ CRON_CLASSES = [
     "api.cron.CreateAdminsConfig",
     "server_admins.cron.DisablingPrivilegedByEndTime",
     "server_admins.cron.DisablingServerPrivilegedByEndTime",
+    "server_admins.cron.DisablingServerPrivilegedPacksByEndTime",
     "server_rotations_api.cron.CreateRotationsFiles",
 ]
 

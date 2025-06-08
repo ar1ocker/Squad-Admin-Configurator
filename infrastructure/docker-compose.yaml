@@ -34,7 +34,7 @@ services:
 
   squad-admin-configurator:
     build: ../squad-admin-configurator/
-    command: "gunicorn squad_admin_configurator.wsgi:application --bind 0:8000"
+    command: "gunicorn settings.wsgi:application --bind 0:8000"
     stop_signal: SIGINT
     restart: always
     volumes:
@@ -75,7 +75,7 @@ services:
     volumes:
       - postgres_value:/var/lib/postgresql/data/
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
       interval: 5s
       timeout: 5s
       retries: 5
