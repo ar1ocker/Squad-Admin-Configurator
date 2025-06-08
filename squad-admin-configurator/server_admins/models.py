@@ -138,7 +138,9 @@ class ServerPrivilegedPack(models.Model):
         verbose_name="Список steam id", blank=True, help_text="Поддерживаются комментарии начинающиеся с символа #"
     )
     roles: "models.ManyToManyField[Role, Role]" = models.ManyToManyField(Role, verbose_name="Роли", blank=True)
-    max_ids = models.PositiveIntegerField(verbose_name="Максимальное количество ID", help_text="0 если ограничений нет")
+    max_ids = models.PositiveIntegerField(
+        verbose_name="Максимальное количество ID", help_text="0 если ограничений нет", default=0
+    )
     moderators = models.ManyToManyField(User, verbose_name="Модераторы", related_name="moderated_packs")
 
     is_active = models.BooleanField("Активирован", default=True)
