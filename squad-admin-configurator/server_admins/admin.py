@@ -235,10 +235,14 @@ class ServerPrivilegedPackAdmin(AccessModelAdmin):
 
     @admin.display(description="Сервера")
     def get_servers(self, obj) -> SafeText | str:
+        servers = obj.servers.values_list("title", flat=True)
+        if len(servers) == 0:
+            return ""
+
         return format_html_join(
             mark_safe("<br>"),
             "{}",
-            [obj.servers.values_list("title", flat=True)],
+            [servers],
         )
 
     def get_readonly_fields(self, request, obj: ServerPrivilegedPack | None = None):
