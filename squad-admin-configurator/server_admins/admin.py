@@ -1,11 +1,20 @@
+from datetime import datetime
+
 import adminactions.actions as actions
+from access.admin import AccessModelAdmin
 from django.contrib import admin
 from django.contrib.admin import site
 from django.utils.html import format_html_join
-from django.utils.safestring import mark_safe
-
-from .models import Permission, Privileged, Role, Server, ServerPrivileged
-from .utils import date_or_perpetual
+from django.utils.safestring import SafeText, mark_safe
+from server_admins.models import (
+    Permission,
+    Privileged,
+    Role,
+    Server,
+    ServerPrivileged,
+    ServerPrivilegedPack,
+)
+from server_admins.utils import date_or_perpetual
 
 # Регистрация всех action из adminactions
 actions.add_to_site(site)
@@ -141,10 +150,9 @@ class PrivilegedAdmin(admin.ModelAdmin):
     list_editable = ("is_active",)
     list_filter = (
         "is_active",
-        "servers_roles",
-        "serverprivileged__roles",
+        "server_accesses__roles",
         (
-            "serverprivileged__is_active",
+            "server_accesses__is_active",
             custom_titled_filter("Есть активированные привилегии на серверах"),
         ),
         "date_of_end",
@@ -163,7 +171,7 @@ class PrivilegedAdmin(admin.ModelAdmin):
 
     @admin.display(description="Роли на всех серверах")
     def get_roles(self, obj) -> str:
-        servers_roles = obj.serverprivileged_set.select_related("server").prefetch_related("roles")
+        servers_roles = obj.server_accesses.select_related("server").prefetch_related("roles")
         servers_text = []
         for serv in servers_roles:
             symbol = "🟢" if serv.is_active else "🔴"
@@ -177,3 +185,67 @@ class PrivilegedAdmin(admin.ModelAdmin):
             "{}",
             ((i,) for i in servers_text),
         )
+
+
+@admin.register(ServerPrivilegedPack)
+class ServerPrivilegedPackAdmin(AccessModelAdmin):
+    fields_for_moderator = ("steam_ids",)
+    fields = (
+        "title",
+        "is_active",
+        "steam_ids",
+        "servers",
+        "roles",
+        "max_ids",
+        "moderators",
+        "creation_date",
+        "date_of_end",
+        "comment",
+    )
+    readonly_fields = ("creation_date",)
+    list_display = (
+        "is_active",
+        "title",
+        "get_servers",
+        "max_ids",
+        "creation_date",
+        "date_of_end_view",
+    )
+    list_display_links = ("title", "get_servers")
+    list_filter = (
+        (
+            "servers__title",
+            custom_titled_filter("Название сервера"),
+        ),
+        "is_active",
+        "roles",
+        "date_of_end",
+        "creation_date",
+    )
+    ordering = ("-creation_date",)
+    search_fields = ("steam_ids", "servers__title")
+
+    @admin.display(
+        ordering="-date_of_end",
+        empty_value="Бессрочно",
+        description="Дата окончания полномочий",
+    )
+    def date_of_end_view(self, obj: ServerPrivilegedPack) -> datetime | None:
+        return obj.date_of_end
+
+    @admin.display(description="Сервера")
+    def get_servers(self, obj) -> SafeText | str:
+        return format_html_join(
+            mark_safe("<br>"),
+            "{}",
+            [obj.servers.values_list("title", flat=True)],
+        )
+
+    def get_readonly_fields(self, request, obj: ServerPrivilegedPack | None = None):
+        if request.user.is_superuser or obj is None:
+            return super().get_readonly_fields(request, obj)
+
+        if obj.moderators.filter(pk=request.user.pk).exists():
+            return set(self.fields) - set(self.fields_for_moderator)
+
+        return super().get_readonly_fields(request, obj)

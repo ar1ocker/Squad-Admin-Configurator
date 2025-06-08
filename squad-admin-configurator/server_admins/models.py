@@ -1,9 +1,16 @@
 import re
+from typing import TYPE_CHECKING
 
-from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Q
-from django.utils import timezone
+
+from .steam_ids_parser import SteamIDsSpec
+
+if TYPE_CHECKING:
+    from django.db.models import Manager
+
+User = get_user_model()
 
 
 class Server(models.Model):
@@ -17,6 +24,9 @@ class Server(models.Model):
 
     description = models.CharField("Описание", max_length=300, blank=True)
 
+    privileged_accesses: "Manager[ServerPrivileged]"
+    privileged_accesses_packs: "Manager[ServerPrivilegedPack]"
+
     def __str__(self) -> str:
         return self.title
 
@@ -24,54 +34,6 @@ class Server(models.Model):
         verbose_name = "Сервер"
         verbose_name_plural = "1. Сервера"
         ordering = ["-title"]
-
-    def get_config(self) -> str:
-        time_format: str = settings.TIME_FORMAT
-        now: timezone.datetime = timezone.now()
-
-        if not self.is_active:
-            return f"// {self.title} DISABLED! {now.strftime(time_format)}"
-
-        config_text: str = f"// {self.title} {now.strftime(time_format)}\n\n"
-
-        server_roles = (
-            ServerPrivileged.objects.filter(
-                Q(date_of_end__gte=now) | Q(date_of_end=None),
-                Q(privileged__date_of_end__gte=now) | Q(privileged__date_of_end=None),
-                privileged__is_active=True,
-                is_active=True,
-                server=self,
-            )
-            .select_related("privileged")
-            .prefetch_related("roles__permissions")
-        )
-
-        roles: dict = {}
-        privileged_by_role: dict = {}
-
-        for server_role in server_roles:
-            for role in server_role.roles.all():
-                if not role.is_active:
-                    continue
-
-                if role.title not in roles:
-                    permissions: str = ",".join([perm.title for perm in role.permissions.all()])
-                    roles[role.title] = f"Group={role.title}:{permissions}"
-                    privileged_by_role[role.title] = f"// {role.title}\n"
-
-                privileged_by_role[role.title] += (
-                    f"Admin={server_role.privileged.steam_id}"
-                    f":{role.title}"
-                    " //"
-                    f" {server_role.privileged.name}"
-                    "\n"
-                )
-
-        roles_text: str = "\n".join([role for role in roles.values()])
-        privileged_text: str = "\n\n".join([text for text in privileged_by_role.values()])
-        config_text += f"// Roles\n{roles_text}\n\n{privileged_text}"
-
-        return config_text
 
 
 class Permission(models.Model):
@@ -99,7 +61,9 @@ class Role(models.Model):
 
     title = models.CharField("Название", max_length=200, unique=True)
     is_active = models.BooleanField("Активирован", default=True)
-    permissions = models.ManyToManyField(Permission, blank=True, verbose_name="Разрешения")
+    permissions: "models.ManyToManyField[Permission, Permission]" = models.ManyToManyField(
+        Permission, blank=True, verbose_name="Разрешения"
+    )
     description = models.CharField("Описание", max_length=300, blank=True)
 
     def __str__(self) -> str:
@@ -117,18 +81,12 @@ class Privileged(models.Model):
     """
 
     name = models.CharField("Имя", max_length=200)
-
     steam_id = models.BigIntegerField("Steam ID", unique=True)
 
     is_active = models.BooleanField("Активирован", default=True)
-
     description = models.TextField("Описание", blank=True)
-
     creation_date = models.DateTimeField("Дата добавления", auto_now_add=True)
-
     date_of_end = models.DateTimeField("Общая дата окончания полномочий", blank=True, null=True)
-
-    servers_roles = models.ManyToManyField(Server, through="ServerPrivileged", blank=True, verbose_name="Сервера")
 
     def __str__(self) -> str:
         return f"{self.name}"
@@ -147,9 +105,13 @@ class ServerPrivileged(models.Model):
     дополнительной информацией
     """
 
-    server = models.ForeignKey(Server, verbose_name="Сервер", on_delete=models.CASCADE)
-    privileged = models.ForeignKey(Privileged, verbose_name="Пользователь", on_delete=models.CASCADE)
-    roles = models.ManyToManyField(Role, verbose_name="Роль")
+    server = models.ForeignKey(
+        Server, verbose_name="Сервер", related_name="privileged_accesses", on_delete=models.CASCADE
+    )
+    privileged = models.ForeignKey(
+        Privileged, verbose_name="Пользователь", related_name="server_accesses", on_delete=models.CASCADE
+    )
+    roles: "models.ManyToManyField[Role, Role]" = models.ManyToManyField(Role, verbose_name="Роль")
 
     is_active = models.BooleanField("Активирована", default=True)
     creation_date = models.DateTimeField("Дата добавления", auto_now_add=True)
@@ -158,8 +120,55 @@ class ServerPrivileged(models.Model):
     comment = models.CharField("Комментарий", blank=True, max_length=200)
 
     def __str__(self) -> str:
-        return f"ID {self.id}"
+        return f"ID {self.pk}"
 
     class Meta:
         verbose_name = "Роль на сервере"
         verbose_name_plural = "5. Роли пользователей на серверах"
+
+
+class ServerPrivilegedPack(models.Model):
+    title = models.CharField(verbose_name="Название", max_length=200)
+
+    servers = models.ManyToManyField(
+        Server, verbose_name="Сервера", related_name="privileged_accesses_packs", blank=True
+    )
+
+    steam_ids = models.TextField(
+        verbose_name="Список steam id", blank=True, help_text="Поддерживаются комментарии начинающиеся с символа #"
+    )
+    roles: "models.ManyToManyField[Role, Role]" = models.ManyToManyField(Role, verbose_name="Роли", blank=True)
+    max_ids = models.PositiveIntegerField(verbose_name="Максимальное количество ID", help_text="0 если ограничений нет")
+    moderators = models.ManyToManyField(User, verbose_name="Модераторы", related_name="moderated_packs")
+
+    is_active = models.BooleanField("Активирован", default=True)
+    creation_date = models.DateTimeField("Дата добавления", auto_now_add=True)
+    date_of_end = models.DateTimeField("Дата окончания действия", blank=True, null=True)
+
+    comment = models.CharField("Комментарий", blank=True, max_length=200)
+
+    def __str__(self) -> str:
+        return f"ID {self.pk}"
+
+    class Meta:
+        verbose_name = "Список пользователей"
+        verbose_name_plural = "6. Списки пользователей"
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        return super().save(*args, **kwargs)
+
+    def clean(self):
+        if not self.is_active:
+            return
+
+        nodes = SteamIDsSpec.parse(self.steam_ids)
+        errors = SteamIDsSpec.check_errors(nodes=nodes)
+
+        if errors:
+            raise ValidationError({"steam_ids": [", ".join(errors)]})
+
+        steam_ids = list(filter(lambda node: node.kind == SteamIDsSpec.STEAMID.name, nodes))
+
+        if self.max_ids > 0 and len(steam_ids) > self.max_ids:
+            raise ValidationError({"steam_ids": [f"Максимальное количество ID - {self.max_ids}"]})
