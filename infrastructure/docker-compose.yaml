@@ -1,35 +1,99 @@
-version: '3.8'
+
+name: squad-admin-configurator
 
 services:
-  db:
-    image: postgres:15.4-bookworm
-    restart: always
-    volumes:
-      - postgres_value:/var/lib/postgresql/data/
-    env_file:
-      - ./.env
-  squad-admin-configurator:
-    build: ../squad-admin-configurator
-    restart: always
-    volumes:
-      - static_value:/app/static
-      - ~/squad_admins_configs:/app/admins_configs
-      - ~/squad_rotations_configs:/app/rotations_configs
-    depends_on:
-      - db
-    env_file:
-      - ./.env
   nginx:
     image: nginx:alpine
     restart: always
     ports:
       - 80:80
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
       - static_value:/var/html/static
+    group_add:
+      - 110 # для чтения статики из сервиса playtime
     depends_on:
       - squad-admin-configurator
+    networks:
+      - to-wan-network
+    configs:
+      - source: nginx
+        target: /etc/nginx/conf.d/default.conf
+
+  squad-admin-configurator-migrations:
+    build: ../squad-admin-configurator/
+    command: ["./migrations.sh"]
+    stop_signal: SIGINT
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - only-lan-network
+    configs:
+      - source: squad-admin-configurator
+        target: /app/config.toml
+
+  squad-admin-configurator:
+    build: ../squad-admin-configurator/
+    command: "gunicorn settings.wsgi:application --bind 0:8000"
+    stop_signal: SIGINT
+    restart: always
+    volumes:
+      - static_value:/app/static
+      - /squad_admins_configs:/app/admins_configs
+      - /squad_rotations_configs:/app/rotations_configs
+    group_add:
+      - 110
+    depends_on:
+      squad-admin-configurator-migrations:
+        condition: service_completed_successfully
+    networks:
+      - only-lan-network
+      - to-wan-network
+    configs:
+      - source: squad-admin-configurator
+        target: /app/config.toml
+
+  squad-admin-configurator-cron:
+    build: ../squad-admin-configurator/
+    command: ["python3", "manage.py", "cronloop", "-s", "300"]
+    stop_signal: SIGINT
+    restart: always
+    volumes:
+      - /squad_admins_configs:/app/admins_configs
+      - /squad_rotations_configs:/app/rotations_configs
+    depends_on:
+      - squad-admin-configurator
+    networks:
+      - only-lan-network
+    configs:
+      - source: squad-admin-configurator
+        target: /app/config.toml
+
+  db:
+    image: postgres:15.4-bookworm
+    restart: always
+    volumes:
+      - postgres_value:/var/lib/postgresql/data/
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - only-lan-network
+    env_file:
+      - ./configs/postgres/postgres.env
 
 volumes:
   postgres_value:
   static_value:
+
+networks:
+  to-wan-network:
+  only-lan-network:
+
+configs:
+  squad-admin-configurator:
+    file: ./configs/squad-admin-configurator/config.toml
+  nginx:
+    file: ./configs/nginx/default.conf

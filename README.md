@@ -99,7 +99,7 @@ $ python3 manage.py collectstatic
 
 - Запускаем прослушивание порта
 ``` 
-$ gunicorn "squad_admin_configurator.wsgi:application" --bind <требуемый ip или 0>:<ваш порт>
+$ gunicorn "settings.wsgi:application" --bind <требуемый ip или 0>:<ваш порт>
 ```
 
 Ставим на cron команду, которая будет отслеживать истекшие привилегии

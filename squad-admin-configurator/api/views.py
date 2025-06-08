@@ -16,6 +16,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from server_admins.models import Permission, Privileged, Role, Server, ServerPrivileged
+from server_admins.services.server_config import server__generate_config
 
 from .models import AdminsConfigDistribution, RoleWebhook, WebhookLog
 from .serializers import (
@@ -159,9 +160,10 @@ class ServerConfigView(APIView):
             AdminsConfigDistribution.objects.select_related("server"),
             url=url,
         )
+
         if server_url.is_active:
             return HttpResponse(
-                server_url.server.get_config(),
+                server__generate_config(server=server_url.server),
                 content_type="text/plain;charset=UTF-8",
             )
 

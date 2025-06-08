@@ -1,0 +1,13 @@
+// {{ server.title }} - {{ now_date }}
+{% for role, permissions in roles_with_permissions.items %}
+Group={{ role.title }}:{{ permissions }}{% endfor %}
+{% for role, privileges in privileged_by_role.items %}
+// Role: {{ role.title }}{% for privileged in privileges %}
+Admin={{ privileged.steam_id }}:{{ role.title }} // {{ privileged.name }}{% endfor %}
+{% endfor %}
+{% if packs_by_role|length > 0 %}// Packs{% endif %}
+{% for role, pack_configs in packs_by_role.items %}
+// Role: {{ role.title }}{% for pack_config in pack_configs %}
+// Pack: {{ pack_config.title }}{% for steam_id in pack_config.steam_ids %}
+Admin={{ steam_id }}:{{ role.title }}{% endfor %}{% endfor %}
+{% endfor %}

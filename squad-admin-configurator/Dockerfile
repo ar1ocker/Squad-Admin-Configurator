@@ -1,4 +1,4 @@
-FROM python:3.10-alpine3.18
+FROM python:3.10-alpine
 
 ENV PYTHONDONTWRITEBYTECODE=1
 
@@ -6,25 +6,18 @@ WORKDIR /app
 
 RUN adduser -u 5678 --disabled-password --gecos "" appuser
 
-RUN apk add --no-cache tini
-
 COPY ./requirements.txt ./
 
 RUN pip3 install -r requirements.txt --no-cache-dir
 
 COPY ./ ./
 
-RUN mkdir static
-RUN chmod -R o+x static
-
-RUN python3 manage.py collectstatic --noinput --clear
-RUN python3 manage.py makemigrations --noinput
-
-RUN chmod +x start.sh
-
 RUN chown -R appuser /app
+
+RUN chown -R appuser /usr/local/lib/python3.10/site-packages/django_cron/
+RUN chown -R appuser /usr/local/lib/python3.10/site-packages/jet/
+RUN chmod o+x migrations.sh
+
 USER appuser
 
-ENTRYPOINT ["/sbin/tini", "--"]
-
-CMD ["/bin/sh", "./start.sh"]
+RUN python3 manage.py collectstatic --noinput --clear

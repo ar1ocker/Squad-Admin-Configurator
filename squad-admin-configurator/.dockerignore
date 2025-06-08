@@ -23,7 +23,10 @@
 **/obj
 **/secrets.dev.yaml
 **/values.dev.yaml
+
+static
+
 LICENSE
 README.md
-static
 db.sqlite3
+Dockerfile
