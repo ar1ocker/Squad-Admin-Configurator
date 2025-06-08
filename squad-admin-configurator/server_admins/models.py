@@ -141,7 +141,7 @@ class ServerPrivilegedPack(models.Model):
     max_ids = models.PositiveIntegerField(
         verbose_name="Максимальное количество ID", help_text="0 если ограничений нет", default=0
     )
-    moderators = models.ManyToManyField(User, verbose_name="Модераторы", related_name="moderated_packs")
+    moderators = models.ManyToManyField(User, verbose_name="Модераторы", related_name="moderated_packs", blank=True)
 
     is_active = models.BooleanField("Активирован", default=True)
     creation_date = models.DateTimeField("Дата добавления", auto_now_add=True)
