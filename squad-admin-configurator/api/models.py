@@ -8,6 +8,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.http import HttpRequest
 from ipware import get_client_ip
+from rest_framework.request import Request
 from server_admins.models import Role, Server
 from utils import regex_validator, url_postfix_validator
 
@@ -309,6 +310,16 @@ class RoleWebhook(ReceivedWebhook):
         null=True,
         blank=True,
         help_text="Оставьте пустым для бессрочных полномочий",
+    )
+
+    try_to_increase_existing_record = models.BooleanField(
+        "Попытаться ли увеличить существующую запись?",
+        default=True,
+        help_text=(
+            "Если активно - сервис попытается найти существующую активную запись в выдачей таких же ролей "
+            "на таком же сервере и увеличит время в этой записи, если не найдёт - создаст новую, если не активно "
+            "- будет просто создана новая запись"
+        ),
     )
 
     set_common_date_of_end = models.BooleanField(
