@@ -1,6 +1,8 @@
 from datetime import timedelta
 
+from api.services.role_webhook import role_webhook__create_server_privileges
 from django.db import transaction
+from django.db.models import Count, Q
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
@@ -52,7 +54,7 @@ class RoleWebhookView(GenericAPIView):
         }
     )
     def post(self, request: Request, url: str) -> Response:
-        webhook: RoleWebhook = get_object_or_404(RoleWebhook, url=url)
+        webhook: RoleWebhook = get_object_or_404(RoleWebhook.objects.prefetch_related("servers", "roles"), url=url)
 
         if not webhook.is_active:
             return Response(status=status.HTTP_403_FORBIDDEN)
@@ -77,66 +79,15 @@ class RoleWebhookView(GenericAPIView):
             )
             raise ValidationError(serializer.errors)
 
-        date_of_end = self._calc_date_of_end(webhook, serializer)
+        role_webhook__create_server_privileges(webhook=webhook, validated_data=serializer.validated_data)
 
-        with transaction.atomic():
-            priv_defaults = {
-                "name": serializer.validated_data["name"],
-                "description": serializer.validated_data["comment"],
-            }
-
-            if webhook.set_common_date_of_end:
-                priv_defaults["date_of_end"] = date_of_end
-
-            priv, created = Privileged.objects.get_or_create(
-                steam_id=serializer.validated_data["steam_id"],
-                defaults=priv_defaults,
-            )
-
-            if not created and webhook.active_and_increase_common_date_of_end:
-                need_save = False
-                if not priv.is_active:
-                    priv.is_active = True
-                    need_save = True
-
-                if priv.date_of_end is not None and priv.date_of_end < date_of_end:
-                    priv.date_of_end = date_of_end
-                    need_save = True
-
-                if need_save:
-                    priv.save()
-
-            roles_ids = webhook.roles.values_list("pk", flat=True)
-
-            for server_id in webhook.servers.values_list("pk", flat=True):
-                server_priv = ServerPrivileged.objects.create(
-                    server_id=server_id,
-                    privileged=priv,
-                    date_of_end=date_of_end,
-                    comment=serializer.validated_data["comment"],
-                )
-
-                server_priv.roles.add(*roles_ids)
-
-            webhook.write_log(
-                f"Добавлены роли {serializer.validated_data}",
-                log_level=WebhookLog.INFO,
-                request=request,
-            )
+        webhook.write_log(
+            f"Добавлены роли {serializer.validated_data}",
+            log_level=WebhookLog.INFO,
+            request=request,
+        )
 
         return Response(data={"detail": "Created"})
-
-    def _calc_date_of_end(self, webhook: RoleWebhook, serializer: RoleWebhookSerializer):
-        duration: int
-
-        if webhook.allow_custom_duration_until_end and serializer.validated_data["duration_until_end"]:
-            duration = serializer.validated_data["duration_until_end"]
-        elif webhook.duration_until_end is not None:
-            duration = webhook.duration_until_end
-        else:
-            return None
-
-        return timezone.now() + timedelta(**{webhook.unit_of_duration: duration})
 
 
 class ServerConfigView(APIView):
