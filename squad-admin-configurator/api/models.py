@@ -221,12 +221,12 @@ class ReceivedWebhook(models.Model):
         self,
         message: str,
         log_level: LOG_LEVEL,
-        request=None,
+        request: Request | None = None,
     ) -> None:
         request_info: str = ""
         if request is not None:
             ip, _ = get_client_ip(request)
-            request_info = f"IP: {ip}\nUser-agent: {request.headers.get('user-agent')}"
+            request_info = f"IP: '{ip}'\nUser-agent: '{request.headers.get('user-agent')}'\nData: '{request.data}'"
 
         WebhookLog.objects.create(
             message=message,
