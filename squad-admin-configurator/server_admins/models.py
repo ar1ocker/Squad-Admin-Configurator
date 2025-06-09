@@ -88,6 +88,8 @@ class Privileged(models.Model):
     creation_date = models.DateTimeField("Дата добавления", auto_now_add=True)
     date_of_end = models.DateTimeField("Общая дата окончания полномочий", blank=True, null=True)
 
+    server_accesses: "Manager[ServerPrivileged]"
+
     def __str__(self) -> str:
         return f"{self.name}"
 
