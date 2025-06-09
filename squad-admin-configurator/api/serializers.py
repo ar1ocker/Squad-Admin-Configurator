@@ -59,7 +59,7 @@ class ServerPrivilegedSerializerWrite(serializers.ModelSerializer):
 
 
 class PrivilegedSerializer(QueryFieldsMixin, serializers.ModelSerializer):
-    servers_roles = ServerPrivilegedSerializer(source="serverprivileged_set", many=True, read_only=True)
+    servers_roles = ServerPrivilegedSerializer(source="server_accesses", many=True, read_only=True)
 
     class Meta:
         model = Privileged
