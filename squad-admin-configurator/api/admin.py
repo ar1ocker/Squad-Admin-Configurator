@@ -65,6 +65,7 @@ class RoleWebhookAdmin(admin.ModelAdmin):
                     "roles",
                     "unit_of_duration",
                     "duration_until_end",
+                    "try_to_increase_existing_record",
                     "set_common_date_of_end",
                     "allow_custom_duration_until_end",
                     "active_and_increase_common_date_of_end",
