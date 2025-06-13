@@ -1,20 +1,44 @@
 openapi: 3.0.3
 info:
   title: Squad Admin Configurator
-  version: 1.4.0
+  version: 1.7.0
   description: Панель управления привилегированными пользователями в Squad
 paths:
   /v1/api/privileged/permissions/:
     get:
-      operationId: privileged_permissions_list
+      operationId: v1_api_privileged_permissions_list
       description: View set для доступа к списку разрешений
       parameters:
+      - in: query
+        name: description
+        schema:
+          type: string
+      - in: query
+        name: description__icontains
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
       - in: query
         name: title
         schema:
           type: string
+      - in: query
+        name: title__icontains
+        schema:
+          type: string
       tags:
-      - privileged
+      - v1
       security:
       - tokenAuth: []
       responses:
@@ -22,15 +46,13 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Permission'
+                $ref: '#/components/schemas/PaginatedPermissionList'
           description: ''
     post:
-      operationId: privileged_permissions_create
+      operationId: v1_api_privileged_permissions_create
       description: View set для доступа к списку разрешений
       tags:
-      - privileged
+      - v1
       requestBody:
         content:
           application/json:
@@ -54,17 +76,17 @@ paths:
           description: ''
   /v1/api/privileged/permissions/{id}/:
     get:
-      operationId: privileged_permissions_retrieve
+      operationId: v1_api_privileged_permissions_retrieve
       description: View set для доступа к списку разрешений
       parameters:
       - in: path
         name: id
         schema:
           type: integer
-        description: A unique integer value identifying this Разрешение игрового сервера.
+        description: A unique integer value identifying this Разрешение.
         required: true
       tags:
-      - privileged
+      - v1
       security:
       - tokenAuth: []
       responses:
@@ -75,17 +97,17 @@ paths:
                 $ref: '#/components/schemas/Permission'
           description: ''
     put:
-      operationId: privileged_permissions_update
+      operationId: v1_api_privileged_permissions_update
       description: View set для доступа к списку разрешений
       parameters:
       - in: path
         name: id
         schema:
           type: integer
-        description: A unique integer value identifying this Разрешение игрового сервера.
+        description: A unique integer value identifying this Разрешение.
         required: true
       tags:
-      - privileged
+      - v1
       requestBody:
         content:
           application/json:
@@ -108,17 +130,17 @@ paths:
                 $ref: '#/components/schemas/Permission'
           description: ''
     patch:
-      operationId: privileged_permissions_partial_update
+      operationId: v1_api_privileged_permissions_partial_update
       description: View set для доступа к списку разрешений
       parameters:
       - in: path
         name: id
         schema:
           type: integer
-        description: A unique integer value identifying this Разрешение игрового сервера.
+        description: A unique integer value identifying this Разрешение.
         required: true
       tags:
-      - privileged
+      - v1
       requestBody:
         content:
           application/json:
@@ -140,17 +162,17 @@ paths:
                 $ref: '#/components/schemas/Permission'
           description: ''
     delete:
-      operationId: privileged_permissions_destroy
+      operationId: v1_api_privileged_permissions_destroy
       description: View set для доступа к списку разрешений
       parameters:
       - in: path
         name: id
         schema:
           type: integer
-        description: A unique integer value identifying this Разрешение игрового сервера.
+        description: A unique integer value identifying this Разрешение.
         required: true
       tags:
-      - privileged
+      - v1
       security:
       - tokenAuth: []
       responses:
@@ -158,23 +180,41 @@ paths:
           description: No response body
   /v1/api/privileged/privileges/:
     get:
-      operationId: privileged_privileges_list
+      operationId: v1_api_privileged_privileges_list
       description: View set для доступа к привилегированным пользователям
       parameters:
+      - in: query
+        name: description
+        schema:
+          type: string
+        description: Описание
       - in: query
         name: is_active
         schema:
           type: boolean
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
       - in: query
         name: name
         schema:
           type: string
+        description: Имя
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
       - in: query
         name: steam_id
         schema:
           type: integer
       tags:
-      - privileged
+      - v1
       security:
       - tokenAuth: []
       responses:
@@ -182,15 +222,13 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Privileged'
+                $ref: '#/components/schemas/PaginatedPrivilegedList'
           description: ''
     post:
-      operationId: privileged_privileges_create
+      operationId: v1_api_privileged_privileges_create
       description: View set для доступа к привилегированным пользователям
       tags:
-      - privileged
+      - v1
       requestBody:
         content:
           application/json:
@@ -214,17 +252,17 @@ paths:
           description: ''
   /v1/api/privileged/privileges/{id}/:
     get:
-      operationId: privileged_privileges_retrieve
+      operationId: v1_api_privileged_privileges_retrieve
       description: View set для доступа к привилегированным пользователям
       parameters:
       - in: path
         name: id
         schema:
           type: integer
-        description: A unique integer value identifying this Привилегированный пользователь.
+        description: A unique integer value identifying this Пользователь.
         required: true
       tags:
-      - privileged
+      - v1
       security:
       - tokenAuth: []
       responses:
@@ -235,17 +273,17 @@ paths:
                 $ref: '#/components/schemas/Privileged'
           description: ''
     put:
-      operationId: privileged_privileges_update
+      operationId: v1_api_privileged_privileges_update
       description: View set для доступа к привилегированным пользователям
       parameters:
       - in: path
         name: id
         schema:
           type: integer
-        description: A unique integer value identifying this Привилегированный пользователь.
+        description: A unique integer value identifying this Пользователь.
         required: true
       tags:
-      - privileged
+      - v1
       requestBody:
         content:
           application/json:
@@ -268,17 +306,17 @@ paths:
                 $ref: '#/components/schemas/Privileged'
           description: ''
     patch:
-      operationId: privileged_privileges_partial_update
+      operationId: v1_api_privileged_privileges_partial_update
       description: View set для доступа к привилегированным пользователям
       parameters:
       - in: path
         name: id
         schema:
           type: integer
-        description: A unique integer value identifying this Привилегированный пользователь.
+        description: A unique integer value identifying this Пользователь.
         required: true
       tags:
-      - privileged
+      - v1
       requestBody:
         content:
           application/json:
@@ -300,447 +338,17 @@ paths:
                 $ref: '#/components/schemas/Privileged'
           description: ''
     delete:
-      operationId: privileged_privileges_destroy
+      operationId: v1_api_privileged_privileges_destroy
       description: View set для доступа к привилегированным пользователям
       parameters:
       - in: path
         name: id
         schema:
           type: integer
-        description: A unique integer value identifying this Привилегированный пользователь.
+        description: A unique integer value identifying this Пользователь.
         required: true
       tags:
-      - privileged
-      security:
-      - tokenAuth: []
-      responses:
-        '204':
-          description: No response body
-  /v1/api/privileged/privileges/{privileged_pk}/servers_roles/:
-    get:
-      operationId: privileged_privileges_servers_roles_list
-      description: View set для доступа к привилегированным пользователям на серверах
-      parameters:
-      - in: query
-        name: is_active
-        schema:
-          type: boolean
-      - in: query
-        name: privileged
-        schema:
-          type: integer
-      - in: path
-        name: privileged_pk
-        schema:
-          type: integer
-          title: Пользователь
-        required: true
-      - in: query
-        name: roles
-        schema:
-          type: array
-          items:
-            type: integer
-        explode: true
-        style: form
-      - in: query
-        name: server
-        schema:
-          type: integer
-      tags:
-      - privileged
-      security:
-      - tokenAuth: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ServerPrivileged'
-          description: ''
-    post:
-      operationId: privileged_privileges_servers_roles_create
-      description: View set для доступа к привилегированным пользователям на серверах
-      parameters:
-      - in: path
-        name: privileged_pk
-        schema:
-          type: integer
-          title: Пользователь
-        required: true
-      tags:
-      - privileged
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ServerPrivilegedSerializerWrite'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/ServerPrivilegedSerializerWrite'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/ServerPrivilegedSerializerWrite'
-        required: true
-      security:
-      - tokenAuth: []
-      responses:
-        '201':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ServerPrivilegedSerializerWrite'
-          description: ''
-  /v1/api/privileged/privileges/{privileged_pk}/servers_roles/{id}/:
-    get:
-      operationId: privileged_privileges_servers_roles_retrieve
-      description: View set для доступа к привилегированным пользователям на серверах
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this Роль на сервере.
-        required: true
-      - in: path
-        name: privileged_pk
-        schema:
-          type: integer
-          title: Пользователь
-        required: true
-      tags:
-      - privileged
-      security:
-      - tokenAuth: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ServerPrivileged'
-          description: ''
-    put:
-      operationId: privileged_privileges_servers_roles_update
-      description: View set для доступа к привилегированным пользователям на серверах
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this Роль на сервере.
-        required: true
-      - in: path
-        name: privileged_pk
-        schema:
-          type: integer
-          title: Пользователь
-        required: true
-      tags:
-      - privileged
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ServerPrivilegedSerializerWrite'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/ServerPrivilegedSerializerWrite'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/ServerPrivilegedSerializerWrite'
-        required: true
-      security:
-      - tokenAuth: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ServerPrivilegedSerializerWrite'
-          description: ''
-    patch:
-      operationId: privileged_privileges_servers_roles_partial_update
-      description: View set для доступа к привилегированным пользователям на серверах
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this Роль на сервере.
-        required: true
-      - in: path
-        name: privileged_pk
-        schema:
-          type: integer
-          title: Пользователь
-        required: true
-      tags:
-      - privileged
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PatchedServerPrivilegedSerializerWrite'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/PatchedServerPrivilegedSerializerWrite'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/PatchedServerPrivilegedSerializerWrite'
-      security:
-      - tokenAuth: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ServerPrivilegedSerializerWrite'
-          description: ''
-    delete:
-      operationId: privileged_privileges_servers_roles_destroy
-      description: View set для доступа к привилегированным пользователям на серверах
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this Роль на сервере.
-        required: true
-      - in: path
-        name: privileged_pk
-        schema:
-          type: integer
-          title: Пользователь
-        required: true
-      tags:
-      - privileged
-      security:
-      - tokenAuth: []
-      responses:
-        '204':
-          description: No response body
-  /v1/api/privileged/privileges/{privileged_pk}/servers_roles/{server_privileges_pk}/roles/:
-    get:
-      operationId: privileged_privileges_servers_roles_roles_list
-      description: View set для доступа к списку ролей
-      parameters:
-      - in: query
-        name: is_active
-        schema:
-          type: boolean
-      - in: query
-        name: permissions
-        schema:
-          type: array
-          items:
-            type: integer
-        explode: true
-        style: form
-      - in: path
-        name: privileged_pk
-        schema:
-          type: string
-        required: true
-      - in: path
-        name: server_privileges_pk
-        schema:
-          type: string
-        required: true
-      - in: query
-        name: title
-        schema:
-          type: string
-      tags:
-      - privileged
-      security:
-      - tokenAuth: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Role'
-          description: ''
-    post:
-      operationId: privileged_privileges_servers_roles_roles_create
-      description: View set для доступа к списку ролей
-      parameters:
-      - in: path
-        name: privileged_pk
-        schema:
-          type: string
-        required: true
-      - in: path
-        name: server_privileges_pk
-        schema:
-          type: string
-        required: true
-      tags:
-      - privileged
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RoleSerializerWrite'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/RoleSerializerWrite'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/RoleSerializerWrite'
-        required: true
-      security:
-      - tokenAuth: []
-      responses:
-        '201':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RoleSerializerWrite'
-          description: ''
-  /v1/api/privileged/privileges/{privileged_pk}/servers_roles/{server_privileges_pk}/roles/{id}/:
-    get:
-      operationId: privileged_privileges_servers_roles_roles_retrieve
-      description: View set для доступа к списку ролей
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this Пользовательская роль.
-        required: true
-      - in: path
-        name: privileged_pk
-        schema:
-          type: string
-        required: true
-      - in: path
-        name: server_privileges_pk
-        schema:
-          type: string
-        required: true
-      tags:
-      - privileged
-      security:
-      - tokenAuth: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Role'
-          description: ''
-    put:
-      operationId: privileged_privileges_servers_roles_roles_update
-      description: View set для доступа к списку ролей
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this Пользовательская роль.
-        required: true
-      - in: path
-        name: privileged_pk
-        schema:
-          type: string
-        required: true
-      - in: path
-        name: server_privileges_pk
-        schema:
-          type: string
-        required: true
-      tags:
-      - privileged
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RoleSerializerWrite'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/RoleSerializerWrite'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/RoleSerializerWrite'
-        required: true
-      security:
-      - tokenAuth: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RoleSerializerWrite'
-          description: ''
-    patch:
-      operationId: privileged_privileges_servers_roles_roles_partial_update
-      description: View set для доступа к списку ролей
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this Пользовательская роль.
-        required: true
-      - in: path
-        name: privileged_pk
-        schema:
-          type: string
-        required: true
-      - in: path
-        name: server_privileges_pk
-        schema:
-          type: string
-        required: true
-      tags:
-      - privileged
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PatchedRoleSerializerWrite'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/PatchedRoleSerializerWrite'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/PatchedRoleSerializerWrite'
-      security:
-      - tokenAuth: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RoleSerializerWrite'
-          description: ''
-    delete:
-      operationId: privileged_privileges_servers_roles_roles_destroy
-      description: View set для доступа к списку ролей
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this Пользовательская роль.
-        required: true
-      - in: path
-        name: privileged_pk
-        schema:
-          type: string
-        required: true
-      - in: path
-        name: server_privileges_pk
-        schema:
-          type: string
-        required: true
-      tags:
-      - privileged
+      - v1
       security:
       - tokenAuth: []
       responses:
@@ -748,7 +356,7 @@ paths:
           description: No response body
   /v1/api/privileged/role_webhook/{url}/:
     post:
-      operationId: privileged_role_webhook_create
+      operationId: v1_api_privileged_role_webhook_create
       description: Добавление новых ролей пользователям при вызове вебхука post запросом
       parameters:
       - in: path
@@ -757,7 +365,7 @@ paths:
           type: string
         required: true
       tags:
-      - privileged
+      - v1
       requestBody:
         content:
           application/json:
@@ -800,27 +408,48 @@ paths:
           description: Вебхук не найден
   /v1/api/privileged/roles/:
     get:
-      operationId: privileged_roles_list
+      operationId: v1_api_privileged_roles_list
       description: View set для доступа к списку ролей
       parameters:
       - in: query
         name: is_active
         schema:
           type: boolean
-      - in: query
-        name: permissions
+        description: Активирована ли роль
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
         schema:
-          type: array
-          items:
-            type: integer
-        explode: true
-        style: form
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      - in: query
+        name: permission
+        schema:
+          type: string
+        description: Названия разрешений
+      - in: query
+        name: privileged
+        schema:
+          type: integer
+        description: ID пользователя
+      - in: query
+        name: privileged_steam_id
+        schema:
+          type: integer
+        description: Steam ID пользователя у которого есть связь с ролью
       - in: query
         name: title
         schema:
           type: string
+        description: Название роли
       tags:
-      - privileged
+      - v1
       security:
       - tokenAuth: []
       responses:
@@ -828,15 +457,13 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Role'
+                $ref: '#/components/schemas/PaginatedRoleList'
           description: ''
     post:
-      operationId: privileged_roles_create
+      operationId: v1_api_privileged_roles_create
       description: View set для доступа к списку ролей
       tags:
-      - privileged
+      - v1
       requestBody:
         content:
           application/json:
@@ -860,17 +487,17 @@ paths:
           description: ''
   /v1/api/privileged/roles/{id}/:
     get:
-      operationId: privileged_roles_retrieve
+      operationId: v1_api_privileged_roles_retrieve
       description: View set для доступа к списку ролей
       parameters:
       - in: path
         name: id
         schema:
           type: integer
-        description: A unique integer value identifying this Пользовательская роль.
+        description: A unique integer value identifying this Роль.
         required: true
       tags:
-      - privileged
+      - v1
       security:
       - tokenAuth: []
       responses:
@@ -881,17 +508,17 @@ paths:
                 $ref: '#/components/schemas/Role'
           description: ''
     put:
-      operationId: privileged_roles_update
+      operationId: v1_api_privileged_roles_update
       description: View set для доступа к списку ролей
       parameters:
       - in: path
         name: id
         schema:
           type: integer
-        description: A unique integer value identifying this Пользовательская роль.
+        description: A unique integer value identifying this Роль.
         required: true
       tags:
-      - privileged
+      - v1
       requestBody:
         content:
           application/json:
@@ -914,17 +541,17 @@ paths:
                 $ref: '#/components/schemas/RoleSerializerWrite'
           description: ''
     patch:
-      operationId: privileged_roles_partial_update
+      operationId: v1_api_privileged_roles_partial_update
       description: View set для доступа к списку ролей
       parameters:
       - in: path
         name: id
         schema:
           type: integer
-        description: A unique integer value identifying this Пользовательская роль.
+        description: A unique integer value identifying this Роль.
         required: true
       tags:
-      - privileged
+      - v1
       requestBody:
         content:
           application/json:
@@ -946,17 +573,17 @@ paths:
                 $ref: '#/components/schemas/RoleSerializerWrite'
           description: ''
     delete:
-      operationId: privileged_roles_destroy
+      operationId: v1_api_privileged_roles_destroy
       description: View set для доступа к списку ролей
       parameters:
       - in: path
         name: id
         schema:
           type: integer
-        description: A unique integer value identifying this Пользовательская роль.
+        description: A unique integer value identifying this Роль.
         required: true
       tags:
-      - privileged
+      - v1
       security:
       - tokenAuth: []
       responses:
@@ -964,7 +591,7 @@ paths:
           description: No response body
   /v1/api/privileged/server_config/{url}/:
     get:
-      operationId: privileged_server_config_retrieve
+      operationId: v1_api_privileged_server_config_retrieve
       description: |-
         Получение конфигурации администраторов игрового сервера по get запросу
         с определенным постфиксом
@@ -975,7 +602,7 @@ paths:
           type: string
         required: true
       tags:
-      - privileged
+      - v1
       security:
       - tokenAuth: []
       responses:
@@ -1001,23 +628,43 @@ paths:
           description: Сервер не активен
   /v1/api/privileged/servers/:
     get:
-      operationId: privileged_servers_list
+      operationId: v1_api_privileged_servers_list
       description: View set для доступа к списку серверов
       parameters:
       - in: query
-        name: id
+        name: description
         schema:
-          type: integer
+          type: string
       - in: query
         name: is_active
         schema:
           type: boolean
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      - in: query
+        name: privileged_name
+        schema:
+          type: string
+      - in: query
+        name: privileged_steam_id
+        schema:
+          type: integer
       - in: query
         name: title
         schema:
           type: string
       tags:
-      - privileged
+      - v1
       security:
       - tokenAuth: []
       responses:
@@ -1025,15 +672,13 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Server'
+                $ref: '#/components/schemas/PaginatedServerList'
           description: ''
     post:
-      operationId: privileged_servers_create
+      operationId: v1_api_privileged_servers_create
       description: View set для доступа к списку серверов
       tags:
-      - privileged
+      - v1
       requestBody:
         content:
           application/json:
@@ -1057,7 +702,7 @@ paths:
           description: ''
   /v1/api/privileged/servers/{id}/:
     get:
-      operationId: privileged_servers_retrieve
+      operationId: v1_api_privileged_servers_retrieve
       description: View set для доступа к списку серверов
       parameters:
       - in: path
@@ -1067,7 +712,7 @@ paths:
         description: A unique integer value identifying this Сервер.
         required: true
       tags:
-      - privileged
+      - v1
       security:
       - tokenAuth: []
       responses:
@@ -1078,7 +723,7 @@ paths:
                 $ref: '#/components/schemas/Server'
           description: ''
     put:
-      operationId: privileged_servers_update
+      operationId: v1_api_privileged_servers_update
       description: View set для доступа к списку серверов
       parameters:
       - in: path
@@ -1088,7 +733,7 @@ paths:
         description: A unique integer value identifying this Сервер.
         required: true
       tags:
-      - privileged
+      - v1
       requestBody:
         content:
           application/json:
@@ -1111,7 +756,7 @@ paths:
                 $ref: '#/components/schemas/Server'
           description: ''
     patch:
-      operationId: privileged_servers_partial_update
+      operationId: v1_api_privileged_servers_partial_update
       description: View set для доступа к списку серверов
       parameters:
       - in: path
@@ -1121,7 +766,7 @@ paths:
         description: A unique integer value identifying this Сервер.
         required: true
       tags:
-      - privileged
+      - v1
       requestBody:
         content:
           application/json:
@@ -1143,7 +788,7 @@ paths:
                 $ref: '#/components/schemas/Server'
           description: ''
     delete:
-      operationId: privileged_servers_destroy
+      operationId: v1_api_privileged_servers_destroy
       description: View set для доступа к списку серверов
       parameters:
       - in: path
@@ -1153,7 +798,7 @@ paths:
         description: A unique integer value identifying this Сервер.
         required: true
       tags:
-      - privileged
+      - v1
       security:
       - tokenAuth: []
       responses:
@@ -1161,31 +806,60 @@ paths:
           description: No response body
   /v1/api/privileged/servers_privileges/:
     get:
-      operationId: privileged_servers_privileges_list
+      operationId: v1_api_privileged_servers_privileges_list
       description: View set для доступа к привилегированным пользователям на серверах
       parameters:
-      - in: query
-        name: is_active
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
         schema:
-          type: boolean
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
       - in: query
         name: privileged
         schema:
           type: integer
+      - in: query
+        name: privileged_is_active
+        schema:
+          type: boolean
+        description: Активирован ли пользователь
+      - in: query
+        name: privileged_steam_id
+        schema:
+          type: integer
+        description: Steam ID пользователя
       - in: query
         name: roles
         schema:
           type: array
           items:
             type: integer
-        explode: true
+        description: Несколько значений могут быть разделены запятыми.
+        explode: false
         style: form
       - in: query
         name: server
         schema:
           type: integer
+      - in: query
+        name: server_is_active
+        schema:
+          type: boolean
+        description: Активирован ли сервер
+      - in: query
+        name: server_title
+        schema:
+          type: string
+        description: Название сервера
       tags:
-      - privileged
+      - v1
       security:
       - tokenAuth: []
       responses:
@@ -1193,15 +867,13 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ServerPrivileged'
+                $ref: '#/components/schemas/PaginatedServerPrivilegedList'
           description: ''
     post:
-      operationId: privileged_servers_privileges_create
+      operationId: v1_api_privileged_servers_privileges_create
       description: View set для доступа к привилегированным пользователям на серверах
       tags:
-      - privileged
+      - v1
       requestBody:
         content:
           application/json:
@@ -1225,7 +897,7 @@ paths:
           description: ''
   /v1/api/privileged/servers_privileges/{id}/:
     get:
-      operationId: privileged_servers_privileges_retrieve
+      operationId: v1_api_privileged_servers_privileges_retrieve
       description: View set для доступа к привилегированным пользователям на серверах
       parameters:
       - in: path
@@ -1235,7 +907,7 @@ paths:
         description: A unique integer value identifying this Роль на сервере.
         required: true
       tags:
-      - privileged
+      - v1
       security:
       - tokenAuth: []
       responses:
@@ -1246,7 +918,7 @@ paths:
                 $ref: '#/components/schemas/ServerPrivileged'
           description: ''
     put:
-      operationId: privileged_servers_privileges_update
+      operationId: v1_api_privileged_servers_privileges_update
       description: View set для доступа к привилегированным пользователям на серверах
       parameters:
       - in: path
@@ -1256,7 +928,7 @@ paths:
         description: A unique integer value identifying this Роль на сервере.
         required: true
       tags:
-      - privileged
+      - v1
       requestBody:
         content:
           application/json:
@@ -1279,7 +951,7 @@ paths:
                 $ref: '#/components/schemas/ServerPrivilegedSerializerWrite'
           description: ''
     patch:
-      operationId: privileged_servers_privileges_partial_update
+      operationId: v1_api_privileged_servers_privileges_partial_update
       description: View set для доступа к привилегированным пользователям на серверах
       parameters:
       - in: path
@@ -1289,7 +961,7 @@ paths:
         description: A unique integer value identifying this Роль на сервере.
         required: true
       tags:
-      - privileged
+      - v1
       requestBody:
         content:
           application/json:
@@ -1311,7 +983,7 @@ paths:
                 $ref: '#/components/schemas/ServerPrivilegedSerializerWrite'
           description: ''
     delete:
-      operationId: privileged_servers_privileges_destroy
+      operationId: v1_api_privileged_servers_privileges_destroy
       description: View set для доступа к привилегированным пользователям на серверах
       parameters:
       - in: path
@@ -1321,40 +993,44 @@ paths:
         description: A unique integer value identifying this Роль на сервере.
         required: true
       tags:
-      - privileged
+      - v1
       security:
       - tokenAuth: []
       responses:
         '204':
           description: No response body
-  /v1/api/privileged/servers_privileges/{server_privileges_pk}/roles/:
+  /v1/api/privileged/webhook/:
     get:
-      operationId: privileged_servers_privileges_roles_list
-      description: View set для доступа к списку ролей
+      operationId: v1_api_privileged_webhook_list
+      description: View set только на чтение для доступа к логам вебхуков
       parameters:
       - in: query
-        name: is_active
-        schema:
-          type: boolean
-      - in: query
-        name: permissions
-        schema:
-          type: array
-          items:
-            type: integer
-        explode: true
-        style: form
-      - in: path
-        name: server_privileges_pk
+        name: level
         schema:
           type: string
-        required: true
-      - in: query
-        name: title
+          title: Уровень логирования
+          enum:
+          - error
+          - info
+          - warning
+        description: |-
+          * `info` - Информация
+          * `warning` - Предупреждение
+          * `error` - Ошибка
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
         schema:
-          type: string
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
       tags:
-      - privileged
+      - v1
       security:
       - tokenAuth: []
       responses:
@@ -1362,60 +1038,21 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Role'
+                $ref: '#/components/schemas/PaginatedWebhookLogList'
           description: ''
-    post:
-      operationId: privileged_servers_privileges_roles_create
-      description: View set для доступа к списку ролей
-      parameters:
-      - in: path
-        name: server_privileges_pk
-        schema:
-          type: string
-        required: true
-      tags:
-      - privileged
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RoleSerializerWrite'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/RoleSerializerWrite'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/RoleSerializerWrite'
-        required: true
-      security:
-      - tokenAuth: []
-      responses:
-        '201':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RoleSerializerWrite'
-          description: ''
-  /v1/api/privileged/servers_privileges/{server_privileges_pk}/roles/{id}/:
+  /v1/api/privileged/webhook/{id}/:
     get:
-      operationId: privileged_servers_privileges_roles_retrieve
-      description: View set для доступа к списку ролей
+      operationId: v1_api_privileged_webhook_retrieve
+      description: View set только на чтение для доступа к логам вебхуков
       parameters:
       - in: path
         name: id
         schema:
           type: integer
-        description: A unique integer value identifying this Пользовательская роль.
-        required: true
-      - in: path
-        name: server_privileges_pk
-        schema:
-          type: string
+        description: A unique integer value identifying this Лог вебхука.
         required: true
       tags:
-      - privileged
+      - v1
       security:
       - tokenAuth: []
       responses:
@@ -1423,108 +1060,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Role'
+                $ref: '#/components/schemas/WebhookLog'
           description: ''
-    put:
-      operationId: privileged_servers_privileges_roles_update
-      description: View set для доступа к списку ролей
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this Пользовательская роль.
-        required: true
-      - in: path
-        name: server_privileges_pk
-        schema:
-          type: string
-        required: true
-      tags:
-      - privileged
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RoleSerializerWrite'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/RoleSerializerWrite'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/RoleSerializerWrite'
-        required: true
-      security:
-      - tokenAuth: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RoleSerializerWrite'
-          description: ''
-    patch:
-      operationId: privileged_servers_privileges_roles_partial_update
-      description: View set для доступа к списку ролей
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this Пользовательская роль.
-        required: true
-      - in: path
-        name: server_privileges_pk
-        schema:
-          type: string
-        required: true
-      tags:
-      - privileged
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PatchedRoleSerializerWrite'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/PatchedRoleSerializerWrite'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/PatchedRoleSerializerWrite'
-      security:
-      - tokenAuth: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RoleSerializerWrite'
-          description: ''
-    delete:
-      operationId: privileged_servers_privileges_roles_destroy
-      description: View set для доступа к списку ролей
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this Пользовательская роль.
-        required: true
-      - in: path
-        name: server_privileges_pk
-        schema:
-          type: string
-        required: true
-      tags:
-      - privileged
-      security:
-      - tokenAuth: []
-      responses:
-        '204':
-          description: No response body
   /v1/api/rotations/{url}/current/:
     get:
-      operationId: rotations_current_retrieve
+      operationId: v1_api_rotations_current_retrieve
       description: Получение текущего списка карт
       parameters:
       - in: path
@@ -1533,7 +1073,7 @@ paths:
           type: string
         required: true
       tags:
-      - rotations
+      - v1
       security:
       - tokenAuth: []
       responses:
@@ -1559,7 +1099,7 @@ paths:
           description: Ротация не активна
   /v1/api/rotations/{url}/next/:
     get:
-      operationId: rotations_next_retrieve
+      operationId: v1_api_rotations_next_retrieve
       description: Получение следующего в очереди списка карт
       parameters:
       - in: path
@@ -1568,7 +1108,7 @@ paths:
           type: string
         required: true
       tags:
-      - rotations
+      - v1
       security:
       - tokenAuth: []
       responses:
@@ -1594,6 +1134,154 @@ paths:
           description: Ротация не активна
 components:
   schemas:
+    LevelEnum:
+      enum:
+      - info
+      - warning
+      - error
+      type: string
+      description: |-
+        * `info` - Информация
+        * `warning` - Предупреждение
+        * `error` - Ошибка
+    PaginatedPermissionList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Permission'
+    PaginatedPrivilegedList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Privileged'
+    PaginatedRoleList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Role'
+    PaginatedServerList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Server'
+    PaginatedServerPrivilegedList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServerPrivileged'
+    PaginatedWebhookLogList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhookLog'
     PatchedPermission:
       type: object
       properties:
@@ -1613,11 +1301,6 @@ components:
       properties:
         id:
           type: integer
-          readOnly: true
-        servers_roles:
-          type: array
-          items:
-            $ref: '#/components/schemas/ServerPrivileged'
           readOnly: true
         name:
           type: string
@@ -1736,11 +1419,6 @@ components:
         id:
           type: integer
           readOnly: true
-        servers_roles:
-          type: array
-          items:
-            $ref: '#/components/schemas/ServerPrivileged'
-          readOnly: true
         name:
           type: string
           title: Имя
@@ -1767,18 +1445,12 @@ components:
       - creation_date
       - id
       - name
-      - servers_roles
       - steam_id
     Role:
       type: object
       properties:
         id:
           type: integer
-          readOnly: true
-        permissions:
-          type: array
-          items:
-            $ref: '#/components/schemas/Permission'
           readOnly: true
         title:
           type: string
@@ -1793,7 +1465,6 @@ components:
           maxLength: 300
       required:
       - id
-      - permissions
       - title
     RoleSerializerWrite:
       type: object
@@ -1864,15 +1535,6 @@ components:
         id:
           type: integer
           readOnly: true
-        roles:
-          type: array
-          items:
-            $ref: '#/components/schemas/Role'
-          readOnly: true
-        server:
-          allOf:
-          - $ref: '#/components/schemas/Server'
-          readOnly: true
         is_active:
           type: boolean
           title: Активирована
@@ -1890,9 +1552,18 @@ components:
           type: string
           title: Комментарий
           maxLength: 200
+        server:
+          type: integer
+          title: Сервер
         privileged:
           type: integer
           title: Пользователь
+        roles:
+          type: array
+          items:
+            type: integer
+            title: Роль
+          title: Роль
       required:
       - creation_date
       - id
@@ -1938,6 +1609,44 @@ components:
       - privileged
       - roles
       - server
+    WebhookLog:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        message:
+          type: string
+          title: Лог сообщений
+        request_info:
+          type: string
+          title: Сведения о запросе
+        webhook_info:
+          type: string
+          title: Сведения о вебхуке
+        level:
+          allOf:
+          - $ref: '#/components/schemas/LevelEnum'
+          title: Уровень логирования
+        creation_date:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Дата создания сообщения
+        object_id:
+          type: integer
+          title: ID вебхука
+        content_type:
+          type: integer
+          nullable: true
+          title: Модель вебхука
+      required:
+      - creation_date
+      - id
+      - level
+      - message
+      - object_id
+      - webhook_info
   securitySchemes:
     tokenAuth:
       type: apiKey

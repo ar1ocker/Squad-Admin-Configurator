@@ -165,7 +165,7 @@ REST_FRAMEWORK = {
 SPECTACULAR_SETTINGS = {
     "TITLE": "Squad Admin Configurator",
     "DESCRIPTION": "Панель управления привилегированными пользователями в Squad",
-    "VERSION": "1.4.0",
+    "VERSION": "1.7.0",
     "SERVE_INCLUDE_SCHEMA": False,
 }
 
