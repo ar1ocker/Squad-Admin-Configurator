@@ -1,26 +1,22 @@
-from datetime import timedelta
-
 from api.services.role_webhook import role_webhook__create_server_privileges
-from django.db import transaction
-from django.db.models import Count, Q
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
-from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiExample, OpenApiResponse, extend_schema
-from rest_framework import status
+from rest_framework import status, viewsets
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import SAFE_METHODS
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from server_admins.models import Permission, Privileged, Role, Server, ServerPrivileged
 from server_admins.services.server_config import server__generate_config
 
+from .filters import PrivilegedFilter, RoleFilter, ServerFilter, ServerPrivilegedFilter
 from .models import AdminsConfigDistribution, RoleWebhook, WebhookLog
+from .pagination import DefaultLimitOffsetPagination
 from .serializers import (
     PermissionSerializer,
     PrivilegedSerializer,
@@ -121,39 +117,36 @@ class ServerConfigView(APIView):
         return Response(status=status.HTTP_403_FORBIDDEN)
 
 
-class ServerViewSet(ModelViewSet):
+class ServerViewSet(viewsets.ModelViewSet):
     """View set для доступа к списку серверов"""
 
     queryset = Server.objects.all()
+    pagination_class = DefaultLimitOffsetPagination
     serializer_class = ServerSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ["is_active", "title", "id"]
+    filterset_class = ServerFilter
 
 
-class PermissionViewSet(ModelViewSet):
+class PermissionViewSet(viewsets.ModelViewSet):
     """View set для доступа к списку разрешений"""
 
     queryset = Permission.objects.all()
+    pagination_class = DefaultLimitOffsetPagination
     serializer_class = PermissionSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ["title"]
+    filterset_fields = {
+        "title": ["exact", "icontains"],
+        "description": ["exact", "icontains"],
+    }
 
 
-class RoleViewSet(ModelViewSet):
+class RoleViewSet(viewsets.ModelViewSet):
     """View set для доступа к списку ролей"""
 
-    queryset = Role.objects.prefetch_related("permissions").all()
+    queryset = Role.objects.all()
+    pagination_class = DefaultLimitOffsetPagination
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ["title", "is_active", "permissions"]
-
-    def get_queryset(self):
-        base_manager = Role.objects.prefetch_related("permissions")
-
-        server_privileges_pk: str | None = self.kwargs.get("server_privileges_pk")
-        if server_privileges_pk:
-            return base_manager.filter(serverprivileged=server_privileges_pk).all()
-
-        return base_manager.all()
+    filterset_class = RoleFilter
 
     def get_serializer_class(self):
         if self.request.method in SAFE_METHODS:
@@ -162,30 +155,23 @@ class RoleViewSet(ModelViewSet):
             return RoleSerializerWrite
 
 
-class PrivilegedViewSet(ModelViewSet):
+class PrivilegedViewSet(viewsets.ModelViewSet):
     """View set для доступа к привилегированным пользователям"""
 
-    queryset = Privileged.objects.prefetch_related("serverprivileged_set__roles", "serverprivileged_set__server").all()
+    queryset = Privileged.objects.all()
+    pagination_class = DefaultLimitOffsetPagination
     serializer_class = PrivilegedSerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ["name", "steam_id", "is_active"]
+    filter_backends: list[type[DjangoFilterBackend]] = [DjangoFilterBackend]
+    filterset_class = PrivilegedFilter
 
 
-class ServerPrivilegedViewSet(ModelViewSet):
+class ServerPrivilegedViewSet(viewsets.ModelViewSet):
     """View set для доступа к привилегированным пользователям на серверах"""
 
-    queryset = ServerPrivileged.objects.all()
+    queryset = ServerPrivileged.objects.select_related("privileged", "server").prefetch_related("roles").all()
+    pagination_class = DefaultLimitOffsetPagination
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ["server", "privileged", "roles", "is_active"]
-
-    def get_queryset(self):
-        base_manager = ServerPrivileged.objects.prefetch_related("roles").select_related("server")
-
-        privileged_pk: str | None = self.kwargs.get("privileged_pk")
-        if privileged_pk:
-            return base_manager.filter(privileged=privileged_pk).all()
-
-        return base_manager.all()
+    filterset_class = ServerPrivilegedFilter
 
     def get_serializer_class(self):
         if self.request.method in SAFE_METHODS:
@@ -194,10 +180,11 @@ class ServerPrivilegedViewSet(ModelViewSet):
             return ServerPrivilegedSerializerWrite
 
 
-class WebhookLogViewSet(ReadOnlyModelViewSet):
+class WebhookLogViewSet(viewsets.ReadOnlyModelViewSet):
     """View set только на чтение для доступа к логам вебхуков"""
 
     queryset = WebhookLog.objects.all()
     serializer_class = WebhookLogSerializer
+    pagination_class = DefaultLimitOffsetPagination
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["level"]

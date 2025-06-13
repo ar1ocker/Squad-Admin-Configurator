@@ -23,7 +23,7 @@ DEBUG = false
 # Использовать ли Sqlite, true или false, при false используется Postgresql,
 # для него необходимо задать переменные окружения
 # POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD, DB_HOST, DB_PORT
-SQLITE = false
+SQLITE = true
 POSTGRES_DB = ''
 POSTGRES_USER = ''
 POSTGRES_PASSWORD = ''
