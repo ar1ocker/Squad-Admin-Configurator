@@ -4,6 +4,8 @@ import adminactions.actions as actions
 from access.admin import AccessModelAdmin
 from django.contrib import admin
 from django.contrib.admin import site
+from django.db.models.query import QuerySet
+from django.http.request import HttpRequest
 from django.utils.html import format_html_join
 from django.utils.safestring import SafeText, mark_safe
 from server_admins.models import (
@@ -110,7 +112,10 @@ class ServerPrivilegedAdmin(admin.ModelAdmin):
 
     @admin.display(description="Роли на сервере")
     def get_roles(self, obj) -> str:
-        return ", ".join(obj.roles.values_list("title", flat=True))
+        return ", ".join((role.title for role in obj.roles.all()))
+
+    def get_queryset(self, request: HttpRequest) -> QuerySet:
+        return ServerPrivileged.objects.prefetch_related("roles")
 
 
 @admin.register(Role)
@@ -169,16 +174,22 @@ class PrivilegedAdmin(admin.ModelAdmin):
     def date_of_end_view(self, obj):
         return obj.date_of_end
 
+    def get_queryset(self, request: HttpRequest) -> QuerySet:
+        return Privileged.objects.prefetch_related("server_accesses__roles", "server_accesses__server")
+
     @admin.display(description="Роли на всех серверах")
     def get_roles(self, obj) -> str:
-        servers_roles = obj.server_accesses.select_related("server").prefetch_related("roles")
         servers_text = []
-        for serv in servers_roles:
-            symbol = "🟢" if serv.is_active else "🔴"
-            date_of_end = date_or_perpetual(serv.date_of_end)
-            roles = ", ".join(serv.roles.values_list("title", flat=True))
 
-            servers_text.append(f"{symbol} {serv.server.title} ({date_of_end}): {roles}")
+        for access in obj.server_accesses.all():
+            if not access.is_active:
+                continue
+
+            symbol = "🟢"
+            date_of_end = date_or_perpetual(access.date_of_end)
+            roles = ", ".join((role.title for role in access.roles.all()))
+
+            servers_text.append(f"{symbol} {access.server.title} ({date_of_end}): {roles}")
 
         return format_html_join(
             mark_safe("<br>"),
@@ -235,14 +246,14 @@ class ServerPrivilegedPackAdmin(AccessModelAdmin):
 
     @admin.display(description="Сервера")
     def get_servers(self, obj) -> SafeText | str:
-        servers = obj.servers.values_list("title", flat=True)
+        servers = obj.servers.all()
         if len(servers) == 0:
             return ""
 
         return format_html_join(
             mark_safe("<br>"),
             "{}",
-            [servers],
+            [(server.title for server in servers)],
         )
 
     def get_readonly_fields(self, request, obj: ServerPrivilegedPack | None = None):
@@ -253,3 +264,6 @@ class ServerPrivilegedPackAdmin(AccessModelAdmin):
             return set(self.fields) - set(self.fields_for_moderator)
 
         return super().get_readonly_fields(request, obj)
+
+    def get_queryset(self, request):
+        return ServerPrivilegedPack.objects.prefetch_related("servers")

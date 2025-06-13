@@ -66,6 +66,8 @@ class Role(models.Model):
     )
     description = models.CharField("Описание", max_length=300, blank=True)
 
+    privileged_accesses: "Manager[ServerPrivileged]"
+
     def __str__(self) -> str:
         return self.title
 
@@ -113,7 +115,9 @@ class ServerPrivileged(models.Model):
     privileged = models.ForeignKey(
         Privileged, verbose_name="Пользователь", related_name="server_accesses", on_delete=models.CASCADE
     )
-    roles: "models.ManyToManyField[Role, Role]" = models.ManyToManyField(Role, verbose_name="Роль")
+    roles: "models.ManyToManyField[Role, Role]" = models.ManyToManyField(
+        Role, verbose_name="Роль", related_name="privileged_accesses"
+    )
 
     is_active = models.BooleanField("Активирована", default=True)
     creation_date = models.DateTimeField("Дата добавления", auto_now_add=True)
