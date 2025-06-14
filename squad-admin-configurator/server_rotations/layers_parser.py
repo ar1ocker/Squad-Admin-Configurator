@@ -13,11 +13,10 @@ class Node:
 class LayerSpec(Enum):
     """Спецификация формата файла для списка карт"""
 
-    LAYER = r"^[A-Za-z0-9_]+"
-    COMMENT = r"^\ */.*$"
-    EMPTY = r"\ +"
+    LAYER = r"^[A-Za-z0-9_-]+(?: *\|{1,2} *[A-Za-z+ ]+){0,2}\b"
+    EMPTY = r"[ \t]+"
+    COMMENT = r"#.*$"
     NEWLINE = r"\r\n|\r|\n"
-    MISMATCH_SPELLING = r"[A-Za-z0-9_]+"
     MISMATCH = r".+"
 
     @classmethod
@@ -52,7 +51,7 @@ class LayerSpec(Enum):
             match node.kind:
                 case LayerSpec.NEWLINE.name:
                     current_line += 1
-                case LayerSpec.MISMATCH.name | LayerSpec.MISMATCH_SPELLING.name:
+                case LayerSpec.MISMATCH.name:
                     errors.append(error_description(node.kind, current_line, node.value))
 
         return errors
@@ -63,5 +62,3 @@ def error_description(kind, line, value):
     match kind:
         case LayerSpec.MISMATCH.name:
             return f"Неизвестный символ '{value}' в строке #{line}"
-        case LayerSpec.MISMATCH_SPELLING.name:
-            return f"Название леера '{value}' должно находится в начале строки, строка с ошибкой #{line}"

@@ -174,7 +174,7 @@ class ServerPrivilegedPack(models.Model):
         errors = SteamIDsSpec.check_errors(nodes=nodes)
 
         if errors:
-            raise ValidationError({"steam_ids": [", ".join(errors)]})
+            raise ValidationError({"steam_ids": errors})
 
         steam_ids = list(filter(lambda node: node.kind == SteamIDsSpec.STEAMID.name, nodes))
 

@@ -16,7 +16,7 @@ class SteamIDsSpec(Enum):
 
     EMPTY = r"[ \t]+"
     STEAMID = r"76\d{15}"
-    COMMENT = r"[ \t]*#[\w\d \t#]*$"
+    COMMENT = r"#.*$"
     NEWLINE = r"\r\n|\r|\n"
     MISMATCH = r".+"
 
