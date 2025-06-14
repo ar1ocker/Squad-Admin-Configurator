@@ -6,7 +6,7 @@ from django.contrib import admin
 from django.contrib.admin import site
 from django.db.models.query import QuerySet
 from django.http.request import HttpRequest
-from django.utils.html import format_html_join
+from django.utils.html import format_html, format_html_join
 from django.utils.safestring import SafeText, mark_safe
 from server_admins.models import (
     Permission,
@@ -148,6 +148,7 @@ class PrivilegedAdmin(admin.ModelAdmin):
     list_display = (
         "name",
         "get_roles",
+        "profile",
         "is_active",
         "date_of_end_view",
         "creation_date",
@@ -166,6 +167,15 @@ class PrivilegedAdmin(admin.ModelAdmin):
     ordering = ("-creation_date",)
     search_fields = ("name", "steam_id", "description")
 
+    def get_queryset(self, request: HttpRequest) -> QuerySet:
+        return Privileged.objects.prefetch_related("server_accesses__roles", "server_accesses__server")
+
+    @admin.display(description="Профиль Steam")
+    def profile(self, obj):
+        return format_html(
+            '<a href="https://steamcommunity.com/profiles/{0}" target="_blank">Профиль {0}</a>', obj.steam_id
+        )
+
     @admin.display(
         ordering="-date_of_end",
         empty_value="Бессрочно",
@@ -173,9 +183,6 @@ class PrivilegedAdmin(admin.ModelAdmin):
     )
     def date_of_end_view(self, obj):
         return obj.date_of_end
-
-    def get_queryset(self, request: HttpRequest) -> QuerySet:
-        return Privileged.objects.prefetch_related("server_accesses__roles", "server_accesses__server")
 
     @admin.display(description="Роли на всех серверах")
     def get_roles(self, obj) -> str:
