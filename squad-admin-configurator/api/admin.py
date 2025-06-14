@@ -148,7 +148,10 @@ class AdminsConfigAdmin(admin.ModelAdmin):
         if obj.is_active and obj.type_of_distribution in AdminsConfigDistribution.TYPES_OF_DISTRIBUTION_WITH_API:
             self.message_user(
                 request,
-                "Путь к файлу " + request.build_absolute_uri(reverse("api:server_config", args=(obj.url,))),
+                format_html(
+                    '<a href="{0}" target="_blank">Ссылка на файл - {0}</a>',
+                    request.build_absolute_uri(reverse("api:server_config", args=(obj.url,))),
+                ),
             )
         return super().save_model(request, obj, form, change)
 
