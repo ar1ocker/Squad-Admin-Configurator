@@ -75,7 +75,14 @@ class RoleWebhookView(GenericAPIView):
             )
             raise ValidationError(serializer.errors)
 
-        role_webhook__create_server_privileges(webhook=webhook, validated_data=serializer.validated_data)
+        steam_id = serializer.validated_data["steam_id"]
+        name = serializer.validated_data["name"]
+        comment = serializer.validated_data["comment"]
+        duration_until_end = serializer.validated_data["duration_until_end"]
+
+        role_webhook__create_server_privileges(
+            webhook=webhook, steam_id=steam_id, name=name, duration_until_end=duration_until_end, comment=comment
+        )
 
         webhook.write_log(
             f"Добавлены роли {serializer.validated_data}",
