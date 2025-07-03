@@ -188,8 +188,11 @@ class PrivilegedAdmin(admin.ModelAdmin):
     def get_roles(self, obj) -> str:
         servers_text = []
 
+        not_active_privs_count = 0
+
         for access in obj.server_accesses.all():
             if not access.is_active:
+                not_active_privs_count += 1
                 continue
 
             symbol = "🟢"
@@ -197,6 +200,9 @@ class PrivilegedAdmin(admin.ModelAdmin):
             roles = ", ".join((role.title for role in access.roles.all()))
 
             servers_text.append(f"{symbol} {access.server.title} ({date_of_end}): {roles}")
+
+        if not_active_privs_count:
+            servers_text.append(f"Неактивных привилегий: {not_active_privs_count}")
 
         return format_html_join(
             mark_safe("<br>"),
