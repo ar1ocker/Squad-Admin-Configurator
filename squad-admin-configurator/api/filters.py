@@ -40,10 +40,11 @@ class RoleFilter(django_filters.FilterSet):
 class PrivilegedFilter(django_filters.FilterSet):
     name = django_filters.CharFilter("name", "icontains", label="Имя")
     description = django_filters.CharFilter("description", "icontains", label="Описание")
+    date_of_end = django_filters.IsoDateTimeFromToRangeFilter("date_of_end", label="Общая дата окончания полномочий")
 
     class Meta:
         model = Privileged
-        fields = ("name", "steam_id", "is_active", "description")
+        fields = ("steam_id", "is_active")
 
 
 class ServerPrivilegedFilter(django_filters.FilterSet):
@@ -55,4 +56,4 @@ class ServerPrivilegedFilter(django_filters.FilterSet):
 
     class Meta:
         model = ServerPrivileged
-        fields = ("server", "privileged")
+        fields = ("server", "privileged", "is_active")
