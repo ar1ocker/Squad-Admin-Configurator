@@ -1,0 +1,40 @@
+.stacked, .stacked select, .stacked .selector-available, .stacked .selector-chosen {
+    width: 100%;
+}
+
+.stacked {
+    float: left;
+    flex-direction: column;
+    display:flex;
+}
+
+.stacked select {
+    height: 10.1em;
+}
+
+.stacked ul.selector-chooser {
+    width: 56px;
+    height: 26px;
+    padding: 0 2px;
+    margin: 15px auto;
+    transform: none;
+}
+
+.stacked .selector-chooser li {
+    float: left;
+    padding: 3px;
+    width: 26px;
+}
+
+.stacked .selector-add {
+    background-position: 0 -40px;
+}
+
+.stacked .selector-remove {
+    background-position: 0 0;
+}
+
+.stacked .selector-add, .stacked .selector-remove {
+    background-size: 20px auto;
+    height: 22px;
+}

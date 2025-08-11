@@ -127,6 +127,10 @@ USE_I18N = True
 
 USE_TZ = True
 
+STATICFILES_DIRS = [
+    BASE_DIR / "base_static",
+]
+
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "static"
 
@@ -171,6 +175,7 @@ JAZZMIN_SETTINGS = {
     "site_title": "Squad Configurator",
     "site_header": "Squad Configurator",
     "site_brand": "Squad Configurator",
+    "custom_css": "admin/stacked.css",
     "site_logo": None,
     "login_logo": None,
     "login_logo_dark": None,

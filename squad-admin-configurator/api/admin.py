@@ -89,8 +89,10 @@ class RoleWebhookAdmin(admin.ModelAdmin):
                 "classes": ["collapse"],
                 "fields": [
                     "hmac_is_active",
-                    ("hmac_hash_type", "hmac_secret_key"),
-                    ("hmac_header", "hmac_header_regex"),
+                    "hmac_hash_type",
+                    "hmac_secret_key",
+                    "hmac_header",
+                    "hmac_header_regex",
                     "request_sender",
                 ],
                 "description": (
@@ -106,7 +108,7 @@ class RoleWebhookAdmin(admin.ModelAdmin):
     list_display = ("description", "is_active", "url", "hmac_is_active")
     list_editable = ("is_active",)
     list_filter = ("is_active",)
-    filter_horizontal = ("servers", "roles")
+    filter_vertical = ("servers", "roles")
 
     def save_model(self, request, obj, form, change):
         """Отправка сообщений с текущим полным url к вебхуку"""

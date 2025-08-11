@@ -122,7 +122,7 @@ class ServerPrivilegedAdmin(admin.ModelAdmin):
 class RoleAdmin(admin.ModelAdmin):
     list_display = ("title", "description", "is_active")
     list_editable = ("is_active",)
-    filter_horizontal = ("permissions",)
+    filter_vertical = ("permissions",)
 
 
 @admin.register(Permission)
