@@ -1,10 +1,3 @@
-[ADMIN_SITE]
-# Заголовки в шапке админки
-# просто текст
-ADMIN_SITE_HEADER = "Squad Admin Configurator"
-ADMIN_SITE_TITLE = "Управление привилегированными пользователями"
-ADMIN_INDEX_TITLE = "Squad Admin Configurator"
-
 [SERVER]
 # Базовый IP или домен, используется для генерации ссылки на страницу конфигуратора
 # когда реквест недоступен.

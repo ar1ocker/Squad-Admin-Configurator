@@ -15,7 +15,6 @@ COPY ./ ./
 RUN chown -R appuser /app
 
 RUN chown -R appuser /usr/local/lib/python3.10/site-packages/django_cron/
-RUN chown -R appuser /usr/local/lib/python3.10/site-packages/jet/
 RUN chmod o+x migrations.sh
 
 USER appuser

@@ -18,14 +18,14 @@ CSRF_TRUSTED_ORIGINS = CONFIG["DJANGO"]["CSRF_TRUSTED_ORIGINS"]
 
 INSTALLED_APPS = [
     "adminactions",
-    "jet",
+    "access",
+    "jazzmin",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "access",
     "rest_framework",
     "rest_framework.authtoken",
     "django_filters",
@@ -150,10 +150,6 @@ TIME_FORMAT = "%d-%m-%y %H:%M:%S"
 DISCORD = CONFIG["DISCORD"]
 HMAC_VALIDATION = CONFIG["HMAC_VALIDATION"]
 
-ADMIN_SITE_HEADER = CONFIG["ADMIN_SITE"]["ADMIN_SITE_HEADER"]
-ADMIN_SITE_TITLE = CONFIG["ADMIN_SITE"]["ADMIN_SITE_TITLE"]
-ADMIN_INDEX_TITLE = CONFIG["ADMIN_SITE"]["ADMIN_INDEX_TITLE"]
-
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.TokenAuthentication",
@@ -171,4 +167,53 @@ SPECTACULAR_SETTINGS = {
 
 X_FRAME_OPTIONS = "sameorigin"
 
-JET_SIDE_MENU_COMPACT = True
+JAZZMIN_SETTINGS = {
+    "site_title": "Squad Configurator",
+    "site_header": "Squad Configurator",
+    "site_brand": "Squad Configurator",
+    "site_logo": None,
+    "login_logo": None,
+    "login_logo_dark": None,
+    "site_logo_classes": "img-circle",
+    "site_icon": None,
+    "welcome_sign": "Welcome to Squad Configurator",
+    "copyright": "<a href='https://github.com/ar1ocker'>Ar1ocker - Github</a>",
+    "search_model": "server_admins.Privileged",
+    "topmenu_links": [
+        {"name": "Ar1ocker - Creator Github", "url": "https://github.com/ar1ocker/", "new_window": True},
+    ],
+    "show_sidebar": True,
+    "navigation_expanded": True,
+    "hide_apps": [],
+    "hide_models": [],
+    "order_with_respect_to": [
+        "server_admins",
+        "server_rotations",
+        "api",
+        "server_rotations_api",
+        "auth",
+        "django_cron_proxy",
+    ],
+    "icons": {
+        "auth": "fas fa-users-cog",
+        "auth.user": "fas fa-user",
+        "auth.Group": "fas fa-users",
+        "server_admins.Server": "fas fa-server",
+        "server_admins.Privileged": "fas fa-user",
+        "server_admins.Role": "fas fa-suitcase-rolling",
+        "server_admins.Permission": "fas fa-question",
+        "server_admins.ServerPrivileged": "fas fa-person-digging",
+        "server_admins.ServerPrivilegedPack": "fas fa-users",
+        "api.AdminsConfigDistribution": "fas fa-rss",
+        "api.WebhookLog": "fas fa-book",
+        "api.RoleWebhook": "fas fa-ear-listen",
+        "server_rotations.LayersPack": "fas fa-book",
+        "server_rotations.Rotation": "fas fa-layer-group",
+        "server_rotations_api.RotationDistribution": "fas fa-rss",
+        "auth_api.TokenProxy": "fas fa-key",
+        "django_cron_proxy.CronJobLog": "fas fa-book",
+    },
+    "default_icon_parents": "fas fa-chevron-circle-right",
+    "default_icon_children": "fas fa-circle",
+    "related_modal_active": False,
+}

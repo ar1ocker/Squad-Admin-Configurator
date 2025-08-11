@@ -5,4 +5,4 @@ class CronJobLog(OriginalCronJobLog):
     class Meta:
         proxy = True
         verbose_name = "Лог"
-        verbose_name_plural = "1. Логи"
+        verbose_name_plural = "Логи"
