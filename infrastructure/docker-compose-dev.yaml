@@ -23,6 +23,8 @@ services:
       - "5678:5678"
     develop:
       watch:
+        - path: ../squad-admin-configurator/requirements.txt
+          action: rebuild
         - path: ../squad-admin-configurator
           target: /app
           action: sync
