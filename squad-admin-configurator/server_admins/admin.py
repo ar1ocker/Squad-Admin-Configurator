@@ -238,7 +238,7 @@ class ServerPrivilegedPackAdmin(AccessModelAdmin):
         "servers",
         "roles",
         "max_ids",
-        "moderators",
+        "managers",
         "creation_date",
         "date_of_end",
         "comment",
@@ -311,11 +311,14 @@ class ServerPrivilegedPackAdmin(AccessModelAdmin):
         if request.user.is_superuser or obj is None:
             return super().get_readonly_fields(request, obj)
 
-        if obj.moderators.filter(pk=request.user.pk).exists():
+        if obj.managers.filter(pk=request.user.pk).exists():
             return set(self.fields) - set(self.fields_for_moderator)
 
         return super().get_readonly_fields(request, obj)
 
     def get_queryset(self, request):
         self.request = request
-        return ServerPrivilegedPack.objects.prefetch_related("servers")
+        if self.request.user.is_superuser:
+            return ServerPrivilegedPack.objects.prefetch_related("servers")
+
+        return ServerPrivilegedPack.objects.filter(managers=self.request.user).prefetch_related("servers")

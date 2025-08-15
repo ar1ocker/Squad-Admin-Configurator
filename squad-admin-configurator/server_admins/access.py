@@ -8,8 +8,8 @@ AccessManager.register_plugins(
         ServerPrivilegedPack: CompoundPlugin(
             DjangoAccessPlugin(),
             ApplyAblePlugin(
-                visible=lambda queryset, request: queryset.filter(moderators=request.user),
-                changeable=lambda queryset, request: queryset.filter(moderators=request.user),
+                visible=lambda queryset, request: queryset.filter(managers=request.user),
+                changeable=lambda queryset, request: queryset.filter(managers=request.user),
             ),
         )
     }

@@ -209,11 +209,11 @@ class ServerPrivilegedPack(models.Model):
         "0 если ограничений нет",
         default=0,
     )
-    moderators = models.ManyToManyField(
+    managers = models.ManyToManyField(
         User,
-        verbose_name="Модераторы",
-        related_name="moderated_packs",
-        help_text="Модераторы которые могут изменять список",
+        verbose_name="Менеджеры",
+        related_name="managers_packs",
+        help_text="Пользователи которые могут изменять список Steam ID",
         blank=True,
     )
 
