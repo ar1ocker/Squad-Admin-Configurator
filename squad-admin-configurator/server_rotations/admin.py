@@ -90,7 +90,14 @@ class LayersPackAdmin(admin.ModelAdmin):
 
     @admin.display(description="Обработанный список карт")
     def parsed_layers(self, obj: LayersPack) -> str | SafeText:
+        if obj.layers == "":
+            return "-"
+
         layers = [{"layer": node.value} for node in LayerSpec.parse(obj.layers) if node.kind == LayerSpec.LAYER.name]
+
+        if len(layers) == 0:
+            return "-"
+
         table = LayersTable(layers, orderable=False)
 
         return table.as_html(self.request)

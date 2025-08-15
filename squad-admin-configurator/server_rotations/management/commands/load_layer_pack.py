@@ -30,9 +30,7 @@ class Command(BaseCommand):
                 return answer
 
     def add_arguments(self, parser: CommandParser) -> None:
-        parser.add_argument(
-            "file", type=argparse.FileType("r", encoding="utf-8")
-        )
+        parser.add_argument("file", type=argparse.FileType("r", encoding="utf-8"))
         parser.add_argument("--ignore_errors", action="store_true")
 
     def handle(self, *args, **options):
@@ -49,9 +47,7 @@ class Command(BaseCommand):
         layers = [layer_node.value for layer_node in layers_nodes]
 
         if layers:
-            self.stdout.write(
-                f"Найдены карты ({len(layers)}):", self.style.SUCCESS
-            )
+            self.stdout.write(f"Найдены карты ({len(layers)}):", self.style.SUCCESS)
             self.stdout.write("\n".join(layers))
         else:
             self.stdout.write("Карт не найдено", self.style.ERROR)
@@ -62,8 +58,7 @@ class Command(BaseCommand):
             layers_objs = self.create_layers(layers)
 
             layer_pack_layers = [
-                LayerPackLayer(pack=pack, layer=layer, queue_number=key)
-                for key, layer in enumerate(layers_objs)
+                LayerPackLayer(pack=pack, layer=layer, queue_number=key) for key, layer in enumerate(layers_objs)
             ]
 
             LayerPackLayer.objects.bulk_create(layer_pack_layers)
@@ -72,9 +67,7 @@ class Command(BaseCommand):
 
     def create_pack(self):
         while True:
-            pack_name = self.question_with_confirmation(
-                "Введите имя нового пака с картами"
-            )
+            pack_name = self.question_with_confirmation("Введите имя нового набора с картами")
 
             try:
                 return LayersPack.objects.create(title=pack_name)

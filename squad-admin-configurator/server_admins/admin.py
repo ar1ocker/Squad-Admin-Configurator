@@ -289,8 +289,10 @@ class ServerPrivilegedPackAdmin(AccessModelAdmin):
             [(server.title for server in servers)],
         )
 
-    @admin.display(description="Обработанный список Steam ID")
-    def parsed_steam_ids(self, obj: ServerPrivilegedPack):
+    @admin.display(description="Обработанный список Steam ID", empty_value="-")
+    def parsed_steam_ids(self, obj: ServerPrivilegedPack) -> SafeText | str:
+        if obj.steam_ids == "":
+            return "-"
 
         steam_ids_data = []
         for node in SteamIDsSpec.parse(obj.steam_ids):
@@ -298,6 +300,9 @@ class ServerPrivilegedPackAdmin(AccessModelAdmin):
                 steam_ids_data.append({"steam_id": node.value, "comment": ""})
             elif node.kind == SteamIDsSpec.COMMENT.name and len(steam_ids_data) and steam_ids_data[-1]["comment"] == "":
                 steam_ids_data[-1]["comment"] = node.value
+
+        if len(steam_ids_data) == 0:
+            return "-"
 
         table = SteamIDSTable(steam_ids_data, orderable=False)
         return table.as_html(self.request)

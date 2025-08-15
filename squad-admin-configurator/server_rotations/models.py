@@ -9,8 +9,8 @@ from .layers_parser import LayerSpec
 class LayersPack(models.Model):
     """Пак с картами"""
 
-    title = models.CharField("Название", help_text="Название всего пака с картами", max_length=100, unique=True)
-    description = models.CharField("Описание", help_text="Описание пака", max_length=255, blank=True)
+    title = models.CharField("Название", help_text="Название всего набора с картами", max_length=100, unique=True)
+    description = models.CharField("Описание", help_text="Описание набора", max_length=255, blank=True)
     layers = models.TextField(
         "Список карт",
         help_text="Список карт, каждая карта (леер) с новой строки, поддерживаются комментарии с символа #",
@@ -38,7 +38,7 @@ class LayersPack(models.Model):
 
 
 class RotationLayersPack(models.Model):
-    """Through модель между паками и ротациями"""
+    """Through модель между наборами и ротациями"""
 
     pack = models.ForeignKey(
         LayersPack, on_delete=models.CASCADE, verbose_name="Набор с картами", help_text="Набор с картами"
