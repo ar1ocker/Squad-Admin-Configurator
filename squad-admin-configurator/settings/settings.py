@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "rest_framework.authtoken",
+    "django_tables2",
     "django_filters",
     "admin_ordering",
     "auth_api.apps.AuthApiConfig",
@@ -222,3 +223,5 @@ JAZZMIN_SETTINGS = {
     "default_icon_children": "fas fa-circle",
     "related_modal_active": False,
 }
+
+DJANGO_TABLES2_TEMPLATE = "django_tables2/bootstrap4-responsive.html"

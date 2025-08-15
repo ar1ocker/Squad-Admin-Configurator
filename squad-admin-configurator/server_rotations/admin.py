@@ -1,10 +1,17 @@
+from typing import Any
+
 from admin_ordering.admin import OrderableAdmin
 from django.contrib import admin
 from django.core.exceptions import NON_FIELD_ERRORS
+from django.db.models.query import QuerySet
 from django.forms import BaseInlineFormSet, ValidationError
+from django.http.request import HttpRequest
+from django.utils.safestring import SafeText
 from utils import textarea_form
 
+from .layers_parser import LayerSpec
 from .models import LayersPack, Rotation, RotationLayersPack
+from .tables import LayersTable
 
 
 class RotationLayersPackFormset(BaseInlineFormSet):
@@ -15,7 +22,7 @@ class RotationLayersPackFormset(BaseInlineFormSet):
         не будет автоматически проверяться в formset
         """
         error = False
-        error_message = None
+        error_message: dict[str, Any] | None = None
 
         # Получаем "родные" ошибки
         try:
@@ -44,7 +51,7 @@ class RotationLayersPackFormset(BaseInlineFormSet):
             error = True
 
         if error:
-            raise ValidationError(error_message or ["Ошибка при задании даты применения ротации"])
+            raise ValidationError(error_message or "Ошибка при задании даты применения ротации")
 
 
 class RotationLayersPackInline(OrderableAdmin, admin.TabularInline):
@@ -70,9 +77,20 @@ class RotationAdmin(admin.ModelAdmin):
 @admin.register(LayersPack)
 class LayersPackAdmin(admin.ModelAdmin):
     form = textarea_form(LayersPack, ["description"])
-    fields = ["title", "layers", "description", "creation_date"]
-    readonly_fields = ["creation_date"]
+    fields = ["title", "parsed_layers", "layers", "description", "creation_date"]
+    readonly_fields = ["creation_date", "parsed_layers"]
     list_display = ["title", "creation_date"]
     list_display_links = ["title", "creation_date"]
     list_filter = ["creation_date"]
     search_fields = ["title", "description"]
+
+    def get_queryset(self, request: HttpRequest) -> QuerySet:
+        self.request = request
+        return super().get_queryset(request)
+
+    @admin.display(description="Обработанный список карт")
+    def parsed_layers(self, obj: LayersPack) -> str | SafeText:
+        layers = [{"layer": node.value} for node in LayerSpec.parse(obj.layers) if node.kind == LayerSpec.LAYER.name]
+        table = LayersTable(layers, orderable=False)
+
+        return table.as_html(self.request)

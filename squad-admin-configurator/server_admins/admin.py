@@ -18,6 +18,9 @@ from server_admins.models import (
 )
 from server_admins.utils import date_or_perpetual
 
+from .steam_ids_parser import SteamIDsSpec
+from .tables import SteamIDSTable
+
 # Регистрация всех action из adminactions
 actions.add_to_site(site)
 
@@ -217,6 +220,7 @@ class ServerPrivilegedPackAdmin(AccessModelAdmin):
     fields = (
         "title",
         "is_active",
+        "parsed_steam_ids",
         "steam_ids",
         "servers",
         "roles",
@@ -226,7 +230,10 @@ class ServerPrivilegedPackAdmin(AccessModelAdmin):
         "date_of_end",
         "comment",
     )
-    readonly_fields = ("creation_date",)
+    readonly_fields = (
+        "creation_date",
+        "parsed_steam_ids",
+    )
     list_display = (
         "is_active",
         "title",
@@ -269,6 +276,19 @@ class ServerPrivilegedPackAdmin(AccessModelAdmin):
             [(server.title for server in servers)],
         )
 
+    @admin.display(description="Обработанный список Steam ID")
+    def parsed_steam_ids(self, obj: ServerPrivilegedPack):
+
+        steam_ids_data = []
+        for node in SteamIDsSpec.parse(obj.steam_ids):
+            if node.kind == SteamIDsSpec.STEAMID.name:
+                steam_ids_data.append({"steam_id": node.value, "comment": ""})
+            elif node.kind == SteamIDsSpec.COMMENT.name and len(steam_ids_data) and steam_ids_data[-1]["comment"] == "":
+                steam_ids_data[-1]["comment"] = node.value
+
+        table = SteamIDSTable(steam_ids_data, orderable=False)
+        return table.as_html(self.request)
+
     def get_readonly_fields(self, request, obj: ServerPrivilegedPack | None = None):
         if request.user.is_superuser or obj is None:
             return super().get_readonly_fields(request, obj)
@@ -279,4 +299,5 @@ class ServerPrivilegedPackAdmin(AccessModelAdmin):
         return super().get_readonly_fields(request, obj)
 
     def get_queryset(self, request):
+        self.request = request
         return ServerPrivilegedPack.objects.prefetch_related("servers")
