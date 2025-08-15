@@ -9,10 +9,16 @@ from .layers_parser import LayerSpec
 class LayersPack(models.Model):
     """Пак с картами"""
 
-    title = models.CharField("Название", max_length=100, unique=True)
-    description = models.CharField("Описание", max_length=255, blank=True)
-    layers = models.TextField("Лееры", blank=True)
-    creation_date = models.DateTimeField("Дата добавления", auto_now_add=True)
+    title = models.CharField("Название", help_text="Название всего пака с картами", max_length=100, unique=True)
+    description = models.CharField("Описание", help_text="Описание пака", max_length=255, blank=True)
+    layers = models.TextField(
+        "Список карт",
+        help_text="Список карт, каждая карта (леер) с новой строки, поддерживаются комментарии с символа #",
+        blank=True,
+    )
+    creation_date = models.DateTimeField(
+        "Дата добавления", help_text="Дата добавления наборка с картами", auto_now_add=True
+    )
 
     class Meta:
         verbose_name = "набор с картами"
@@ -34,16 +40,22 @@ class LayersPack(models.Model):
 class RotationLayersPack(models.Model):
     """Through модель между паками и ротациями"""
 
-    pack = models.ForeignKey(LayersPack, on_delete=models.CASCADE, verbose_name="Набор с картами")
-    description = models.CharField("Описание", max_length=255, blank=True, null=True)
+    pack = models.ForeignKey(
+        LayersPack, on_delete=models.CASCADE, verbose_name="Набор с картами", help_text="Набор с картами"
+    )
+    description = models.CharField(
+        "Описание", help_text="Описание набора с картами именно в этой ротации", max_length=255, blank=True, null=True
+    )
     rotation = models.ForeignKey(
-        "Rotation",
-        on_delete=models.CASCADE,
-        related_name="packs_through",
-        verbose_name="ротация",
+        "Rotation", on_delete=models.CASCADE, related_name="packs_through", verbose_name="ротация", help_text="Ротация"
     )
 
-    queue_number = models.PositiveSmallIntegerField("Номер в очереди", null=True, blank=True)
+    queue_number = models.PositiveSmallIntegerField(
+        "Номер в очереди",
+        help_text="Он лишь отражает очередность в списке и совсем не ему не обязательно идти подряд )",
+        null=True,
+        blank=True,
+    )
 
     start_date = models.DateField(
         "Дата применения ротации",
@@ -88,12 +100,14 @@ class RotationLayersPack(models.Model):
 
 
 class Rotation(models.Model):
-    title = models.CharField("Название", max_length=50, unique=True)
-    description = models.CharField("Описание", max_length=255, blank=True)
+    title = models.CharField("Название", help_text="Название ротации (до 50 символов)", max_length=50, unique=True)
+    description = models.CharField("Описание", help_text="Описание ротации", max_length=255, blank=True)
 
-    packs = models.ManyToManyField(LayersPack, verbose_name="Наборы карт", through=RotationLayersPack)
+    packs = models.ManyToManyField(
+        LayersPack, verbose_name="Наборы карт", help_text="Список наборов карт по порядку", through=RotationLayersPack
+    )
 
-    creation_date = models.DateTimeField("Дата добавление", auto_now_add=True)
+    creation_date = models.DateTimeField("Дата добавление", help_text="Дата добавления ротации", auto_now_add=True)
 
     class Meta:
         verbose_name = "ротация"

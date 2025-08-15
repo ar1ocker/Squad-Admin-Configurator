@@ -195,7 +195,7 @@ class ServerPrivilegedPack(models.Model):
     )
 
     steam_ids = models.TextField(
-        verbose_name="Список steam id",
+        verbose_name="Список Steam ID",
         blank=True,
         help_text="Список Steam ID через пробел или с новой строки. "
         "Поддерживаются комментарии начинающиеся с символа #",
@@ -205,7 +205,7 @@ class ServerPrivilegedPack(models.Model):
     )
     max_ids = models.PositiveIntegerField(
         verbose_name="Максимальное количество ID",
-        help_text="Максимальное разрешенное количество Steam ID которое можно записать в список. "
+        help_text="Максимальное разрешенное количество SteamID которое можно записать в список. "
         "0 если ограничений нет",
         default=0,
     )
