@@ -24,17 +24,21 @@ class DistributionModel(models.Model):
 
     TYPES_OF_DISTRIBUTION_WITH_LOCAL = [LOCAL, API_AND_LOCAL]
 
-    is_active = models.BooleanField("Активирован", default=True)
+    is_active = models.BooleanField(
+        "Активирован", help_text="Активирована ли это конфигурация распространения", default=True
+    )
 
-    title = models.CharField("Название", max_length=50)
+    title = models.CharField("Название", help_text="Название конфигурации распространения", max_length=50)
 
-    description = models.CharField("Описание", max_length=300, blank=True)
+    description = models.CharField("Описание", help_text="Описание", max_length=300, blank=True)
 
     type_of_distribution = models.CharField(
         "Вариант распространения конфигурации",
         choices=TYPES_OF_DISTRIBUTION,
         max_length=10,
         default=LOCAL,
+        help_text="Выберите какими путями будет распространятся конфигурация, "
+        "файлом, через API (по ссылке) или комбинированно",
     )
 
     local_filename = models.CharField(
@@ -43,13 +47,17 @@ class DistributionModel(models.Model):
         blank=True,
         null=True,
         validators=[filename_validator],
+        help_text="Название локального файла который будет создаваться в соответствующей папке. "
+        "Доступны латинские буквы, цифры и знак подчеркивания (без множественных знаков подчеркивания подряд)",
     )
     url = models.CharField(
-        "Постфикс url",
+        "Постфикс URL",
         max_length=100,
         blank=True,
         null=True,
         validators=[url_postfix_validator],
+        help_text="Часть URL пути до этой конфигурации, просто любой удобный вам текст. "
+        "Доступны латинские буквы, цифры и знак подчеркивания",
     )
 
     def __str__(self) -> str:

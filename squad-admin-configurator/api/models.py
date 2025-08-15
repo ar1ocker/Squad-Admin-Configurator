@@ -256,6 +256,7 @@ class AdminsConfigDistribution(DistributionModel):
         Server,
         on_delete=models.CASCADE,
         verbose_name="Сервер",
+        help_text="Сервер для которого будет собираться конфигурация привилегированных пользователей",
         related_name="server_url",
     )
 

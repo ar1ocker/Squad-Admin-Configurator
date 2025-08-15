@@ -72,8 +72,8 @@ class RoleWebhookAdmin(admin.ModelAdmin):
                 ],
                 "description": (
                     "При запросе данных вебхуков - на установленных "
-                    "ниже серверах будут выданы"
-                    " роли, запрос должен быть в формате json и "
+                    "ниже серверах будут выданы установленные"
+                    " роли. Запрос должен быть в формате json и "
                     'содержать поля "steam_id", "name" (имя, которым'
                     " будет назван пользователь если не будет "
                     'найден по "steam_id"), "comment" и '
@@ -105,19 +105,16 @@ class RoleWebhookAdmin(admin.ModelAdmin):
     ]
 
     readonly_fields = ("creation_date",)
-    list_display = ("description", "is_active", "url", "hmac_is_active")
+    list_display = ("is_active", "description", "url_link", "hmac_is_active")
     list_editable = ("is_active",)
+    list_display_links = ("description",)
     list_filter = ("is_active",)
     filter_vertical = ("servers", "roles")
 
-    def save_model(self, request, obj, form, change):
-        """Отправка сообщений с текущим полным url к вебхуку"""
-        if obj.is_active:
-            self.message_user(
-                request,
-                "Путь к вебхуку " + request.build_absolute_uri(reverse("api:role_webhook", args=(obj.url,))),
-            )
-        return super().save_model(request, obj, form, change)
+    @admin.display(description="Ссылка на вебхук", ordering="url")
+    def url_link(self, obj: AdminsConfigDistribution):
+        if obj.url:
+            return format_html('<a href="{0}" target="_blank">{0}</a>', reverse("api:role_webhook", args=(obj.url,)))
 
 
 @admin.register(AdminsConfigDistribution)
@@ -136,26 +133,19 @@ class AdminsConfigAdmin(admin.ModelAdmin):
         "is_active",
         "title",
         "type_of_distribution",
+        "url_link",
         "local_filename",
-        "url",
     ]
     list_editable = ["is_active"]
-    list_display_links = ["title"]
+    list_display_links = ["title", "type_of_distribution", "local_filename"]
     list_filter = ["is_active", "type_of_distribution"]
     search_fields = ["title", "description"]
     actions = ["update_config"]
 
-    def save_model(self, request, obj, form, change):
-        """Отправка сообщений с текущим полным url к конфигурации"""
-        if obj.is_active and obj.type_of_distribution in AdminsConfigDistribution.TYPES_OF_DISTRIBUTION_WITH_API:
-            self.message_user(
-                request,
-                format_html(
-                    '<a href="{0}" target="_blank">Ссылка на файл - {0}</a>',
-                    request.build_absolute_uri(reverse("api:server_config", args=(obj.url,))),
-                ),
-            )
-        return super().save_model(request, obj, form, change)
+    @admin.display(description="Ссылка на файл", ordering="url")
+    def url_link(self, obj: AdminsConfigDistribution):
+        if obj.url:
+            return format_html('<a href="{0}" target="_blank">{0}</a>', reverse("api:server_config", args=(obj.url,)))
 
     @admin.action(description="Обновление локального конфига")
     def update_config(self, request, queryset) -> None:
