@@ -51,14 +51,14 @@ class ActivatedServerPrivilegedInline(admin.StackedInline):
     verbose_name_plural = mark_safe('<span style="color: green;">Активированные роли на серверах</span>')
 
     def get_queryset(self, request: HttpRequest) -> QuerySet:
-        return super().get_queryset(request).filter(is_active=True)
+        return ServerPrivileged.objects.filter(is_active=True)
 
 
 class DeactivatedServerPrivilegedInline(ActivatedServerPrivilegedInline):
     verbose_name_plural = mark_safe('<span style="color: red;">Деактивированные роли на серверах</span>')
 
     def get_queryset(self, request: HttpRequest) -> QuerySet:
-        return super().get_queryset(request).filter(is_active=False)
+        return ServerPrivileged.objects.filter(is_active=False)
 
 
 @admin.register(Server)
