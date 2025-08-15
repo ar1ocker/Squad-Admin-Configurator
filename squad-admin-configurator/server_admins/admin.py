@@ -35,7 +35,7 @@ def custom_titled_filter(title):
     return Wrapper
 
 
-class ServerPrivilegedInline(admin.StackedInline):
+class ActivatedServerPrivilegedInline(admin.StackedInline):
     fields = (
         "is_active",
         "creation_date",
@@ -48,7 +48,17 @@ class ServerPrivilegedInline(admin.StackedInline):
     readonly_fields = ("creation_date",)
     model = ServerPrivileged
     extra = 0
-    verbose_name_plural = "Роли на серверах"
+    verbose_name_plural = mark_safe('<span style="color: green;">Активированные роли на серверах</span>')
+
+    def get_queryset(self, request: HttpRequest) -> QuerySet:
+        return super().get_queryset(request).filter(is_active=True)
+
+
+class DeactivatedServerPrivilegedInline(ActivatedServerPrivilegedInline):
+    verbose_name_plural = mark_safe('<span style="color: red;">Деактивированные роли на серверах</span>')
+
+    def get_queryset(self, request: HttpRequest) -> QuerySet:
+        return super().get_queryset(request).filter(is_active=False)
 
 
 @admin.register(Server)
@@ -138,7 +148,10 @@ class PermissionAdmin(admin.ModelAdmin):
 
 @admin.register(Privileged)
 class PrivilegedAdmin(admin.ModelAdmin):
-    inlines = (ServerPrivilegedInline,)
+    inlines = (
+        ActivatedServerPrivilegedInline,
+        DeactivatedServerPrivilegedInline,
+    )
     fields = (
         "is_active",
         "name",

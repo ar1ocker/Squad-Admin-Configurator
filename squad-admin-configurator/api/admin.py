@@ -112,7 +112,7 @@ class RoleWebhookAdmin(admin.ModelAdmin):
     filter_vertical = ("servers", "roles")
 
     @admin.display(description="Ссылка на вебхук", ordering="url")
-    def url_link(self, obj: AdminsConfigDistribution):
+    def url_link(self, obj: RoleWebhook):
         if obj.url:
             return format_html('<a href="{0}" target="_blank">{0}</a>', reverse("api:role_webhook", args=(obj.url,)))
 

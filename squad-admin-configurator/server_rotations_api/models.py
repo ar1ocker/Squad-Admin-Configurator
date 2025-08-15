@@ -14,10 +14,18 @@ class RotationDistribution(DistributionModel):
         Rotation,
         on_delete=models.CASCADE,
         verbose_name="Ротация",
+        help_text="Ротация из которой будет ежедневно браться новые карты",
         related_name="distributions",
     )
-    last_update_date = models.DateTimeField("Дата последнего обновления", blank=True, null=True)
-    last_queue_number = models.PositiveSmallIntegerField("Последний номер в очереди", default=1)
+    last_update_date = models.DateTimeField(
+        "Дата последнего обновления",
+        help_text="Дата когда в последний раз изменялся номер в очереди",
+        blank=True,
+        null=True,
+    )
+    last_queue_number = models.PositiveSmallIntegerField(
+        "Последний номер в очереди", help_text="Последний номер набора с картами который был взят из ротации", default=1
+    )
 
     class Meta(DistributionModel.Meta):
         verbose_name = "распространение ротации"

@@ -26,31 +26,26 @@ class RotationDistributionAdmin(admin.ModelAdmin):
         "type_of_distribution",
         "last_queue_number",
         "last_update_date",
+        "current_rotation_url",
+        "next_rotation_url",
         "local_filename",
-        "url",
     ]
     list_editable = ["is_active"]
     list_display_links = ["title"]
     list_filter = ["is_active", "type_of_distribution"]
     search_fields = ["title", "description"]
 
-    def save_model(self, request, obj, form, change):
-        """Отправка сообщений с текущим полным url к конфигурации"""
-        if obj.is_active and obj.type_of_distribution in RotationDistribution.TYPES_OF_DISTRIBUTION_WITH_API:
-            self.message_user(
-                request,
-                format_html(
-                    '<a href="{0}" target="_blank">Ссылка на текущий файл - {0}</a>',
-                    request.build_absolute_uri(reverse("rotations_api:current_rotation_config", args=(obj.url,))),
-                ),
+    @admin.display(description="Ссылка текущую ротацию", ordering="url")
+    def current_rotation_url(self, obj: RotationDistribution):
+        if obj.url:
+            return format_html(
+                '<a href="{0}" target="_blank">{0}</a>',
+                reverse("rotations_api:current_rotation_config", args=(obj.url,)),
             )
 
-            self.message_user(
-                request,
-                format_html(
-                    '<a href="{0}" target="_blank">Ссылка на следующий файл - {0}</a>',
-                    request.build_absolute_uri(reverse("rotations_api:next_rotation_config", args=(obj.url,))),
-                ),
+    @admin.display(description="Ссылка следующую ротацию", ordering="url")
+    def next_rotation_url(self, obj: RotationDistribution):
+        if obj.url:
+            return format_html(
+                '<a href="{0}" target="_blank">{0}</a>', reverse("rotations_api:next_rotation_config", args=(obj.url,))
             )
-
-        return super().save_model(request, obj, form, change)
