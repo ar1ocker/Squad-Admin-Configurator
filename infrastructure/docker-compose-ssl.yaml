@@ -18,7 +18,7 @@ services:
       - source: nginx
         target: /etc/nginx/conf.d/default.conf
       - source: nginx-ssl-chain
-        target: /etc/ssl/fullchain.pem
+        target: /etc/ssl/chain.pem
       - source: nginx-ssl-fullchain
         target: /etc/ssl/fullchain.pem
       - source: nginx-ssl-privkey
