@@ -90,7 +90,7 @@ class RotationDistribution(DistributionModel):
             number = str(pack_m2m.queue_number)
         else:
             date = (
-                f"{pack_m2m.start_date.strftime(settings.DATE_FORMAT) if pack_m2m.start_date else ""} "
+                f"{pack_m2m.start_date.strftime(settings.DATE_FORMAT) if pack_m2m.start_date else ''} "
                 f"с {pack_m2m.start_time_at.strftime(settings.TIME_FORMAT)} "
                 f"по {pack_m2m.end_time_at.strftime(settings.TIME_FORMAT)}"
             )
