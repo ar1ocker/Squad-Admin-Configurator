@@ -19,7 +19,7 @@ six==1.16.0
 sqlparse==0.5.0
 toml==0.10.2
 typing_extensions==4.7.1
-urllib3==2.2.2
+urllib3==2.6.3
 djangorestframework-queryfields==1.1.0
 django-filter==23.5
 drf-spectacular==0.27.1
