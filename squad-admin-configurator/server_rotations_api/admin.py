@@ -27,7 +27,6 @@ class RotationDistributionAdmin(admin.ModelAdmin):
         "last_queue_number",
         "last_update_date",
         "current_rotation_url",
-        "next_rotation_url",
         "local_filename",
     ]
     list_editable = ["is_active"]
@@ -40,12 +39,5 @@ class RotationDistributionAdmin(admin.ModelAdmin):
         if obj.url:
             return format_html(
                 '<a href="{0}" target="_blank">{0}</a>',
-                reverse("rotations_api:current_rotation_config", args=(obj.url,)),
-            )
-
-    @admin.display(description="Ссылка следующую ротацию", ordering="url")
-    def next_rotation_url(self, obj: RotationDistribution):
-        if obj.url:
-            return format_html(
-                '<a href="{0}" target="_blank">{0}</a>', reverse("rotations_api:next_rotation_config", args=(obj.url,))
+                reverse("rotation_distribution-current", args=(obj.url,)),
             )

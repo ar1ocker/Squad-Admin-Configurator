@@ -1,5 +1,3 @@
-from datetime import timedelta
-
 from base import DistributionModel
 from django.conf import settings
 from django.db import models
@@ -32,40 +30,49 @@ class RotationDistribution(DistributionModel):
         verbose_name_plural = "1. Распространение ротаций"
         ordering = ["rotation"]
 
-    def get_next_pack(self) -> RotationLayersPack | None:
-        """Получает следующий конфиг в очереди"""
-
-        rotation_pack_manager = RotationLayersPack.objects.select_related("pack").order_by("queue_number")
+    def get_next_pack_by_queue(self) -> RotationLayersPack | None:
+        rotation_pack_manager = RotationLayersPack.objects.select_related("pack")
 
         pack_m2m = (
             rotation_pack_manager.order_by(
-                F("queue_number").asc(nulls_first=True),
-                "-start_date",
+                "queue_number",
             )
             .filter(
-                Q(queue_number__gt=self.last_queue_number) | Q(start_date=timezone.now() + timedelta(days=1)),
+                queue_number__isnull=False,
+                queue_number__gt=self.last_queue_number,
                 rotation=self.rotation,
             )
             .first()
         )
 
         if pack_m2m is None:
-            pack_m2m = rotation_pack_manager.filter(
-                rotation=self.rotation,
-                start_date__isnull=True,
-            ).first()
+            pack_m2m = (
+                rotation_pack_manager.order_by("queue_number")
+                .filter(
+                    queue_number__isnull=False,
+                    rotation=self.rotation,
+                    start_date__isnull=True,
+                )
+                .first()
+            )
 
         return pack_m2m
 
     def get_current_pack(self) -> RotationLayersPack | None:
+        now: timezone.datetime = timezone.localtime()
         pack_m2m = (
             RotationLayersPack.objects.select_related("pack")
             .order_by(
                 F("queue_number").asc(nulls_first=True),
-                "-start_date",
+                F("start_date").desc(nulls_first=False),
+                "-start_time_at",
+                "-end_time_at",
+                "id",
             )
             .filter(
-                Q(queue_number=self.last_queue_number) | Q(start_date=timezone.now().date()),
+                Q(queue_number=self.last_queue_number)
+                | Q(Q(start_date=now.date()) & Q(start_time_at__lte=now.time()) & Q(end_time_at__gte=now.time()))
+                | Q(Q(start_date__isnull=True) & Q(start_time_at__lte=now.time()) & Q(end_time_at__gte=now.time())),
                 rotation=self.rotation,
             )
             .first()
@@ -73,16 +80,20 @@ class RotationDistribution(DistributionModel):
         return pack_m2m
 
     def format_config(self, pack_m2m: RotationLayersPack | None) -> str:
-        now = timezone.now()
+        now = timezone.localtime()
         if pack_m2m is None:
-            return f"// Ротаций не найдено {now.strftime(settings.TIME_FORMAT)}"
+            return f"// Ротаций не найдено {now.strftime(settings.DATETIME_FORMAT)} {settings.TIME_ZONE}"
 
         number = None
         date = None
         if pack_m2m.queue_number is not None:
             number = str(pack_m2m.queue_number)
         else:
-            date = pack_m2m.start_date.strftime(settings.TIME_FORMAT)
+            date = (
+                f"{pack_m2m.start_date.strftime(settings.DATE_FORMAT) if pack_m2m.start_date else ""} "
+                f"с {pack_m2m.start_time_at.strftime(settings.TIME_FORMAT)} "
+                f"по {pack_m2m.end_time_at.strftime(settings.TIME_FORMAT)}"
+            )
 
         layers = [layer.value for layer in LayerSpec.parse(pack_m2m.pack.layers) if layer.kind == LayerSpec.LAYER.name]
 
@@ -91,7 +102,7 @@ class RotationDistribution(DistributionModel):
         config = (
             f"// {self.rotation.title}"
             f" - {number or date}"
-            f" - {now.strftime(settings.TIME_FORMAT)}\n\n"
+            f" - {now.strftime(settings.DATETIME_FORMAT)} {settings.TIME_ZONE}\n\n"
             f"{layers_text}"
         )
 

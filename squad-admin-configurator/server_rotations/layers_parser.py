@@ -15,7 +15,7 @@ class LayerSpec(Enum):
 
     LAYER = r"^[A-Za-z0-9_-]+(?: *\|{1,2} *[A-Za-z+ ]+){0,2}\b"
     EMPTY = r"[ \t]+"
-    COMMENT = r"#.*$"
+    COMMENT = r"(#|//).*$"
     NEWLINE = r"\r\n|\r|\n"
     MISMATCH = r".+"
 

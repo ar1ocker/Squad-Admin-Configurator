@@ -14,7 +14,8 @@ def server__generate_config(*, server: Server) -> str:
 
     if not server.is_active:
         return render_to_string(
-            "server_config/admins_inactive.django", {"server": server, "now_date": now.strftime(settings.TIME_FORMAT)}
+            "server_config/admins_inactive.django",
+            {"server": server, "now_date": now.strftime(settings.DATETIME_FORMAT)},
         )
 
     server_privileges = (
@@ -72,7 +73,7 @@ def server__generate_config(*, server: Server) -> str:
         "server_config/admins_active.django",
         {
             "server": server,
-            "now_date": now.strftime(settings.TIME_FORMAT),
+            "now_date": now.strftime(settings.DATETIME_FORMAT),
             "roles_with_permissions": roles_with_permissions,
             "privileged_by_role": privileged_by_role,
             "packs_by_role": packs_by_role,

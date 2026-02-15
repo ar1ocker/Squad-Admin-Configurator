@@ -1,7 +1,5 @@
-from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import F
 
 from .layers_parser import LayerSpec
 
@@ -13,7 +11,7 @@ class LayersPack(models.Model):
     description = models.CharField("Описание", help_text="Описание набора", max_length=255, blank=True)
     layers = models.TextField(
         "Список карт",
-        help_text="Список карт, каждая карта (леер) с новой строки, поддерживаются комментарии с символа #",
+        help_text="Список карт, каждая карта (леер) с новой строки, поддерживаются комментарии с символа # или //",
         blank=True,
     )
     creation_date = models.DateTimeField(
@@ -43,6 +41,13 @@ class RotationLayersPack(models.Model):
     pack = models.ForeignKey(
         LayersPack, on_delete=models.CASCADE, verbose_name="Набор с картами", help_text="Набор с картами"
     )
+    slug = models.SlugField(
+        "Название для url или файла",
+        help_text="Название для url или файла",
+        max_length=255,
+        null=True,
+        blank=True,
+    )
     description = models.CharField(
         "Описание", help_text="Описание набора с картами именно в этой ротации", max_length=255, blank=True, null=True
     )
@@ -52,51 +57,81 @@ class RotationLayersPack(models.Model):
 
     queue_number = models.PositiveSmallIntegerField(
         "Номер в очереди",
-        help_text="Он лишь отражает очередность в списке и совсем не ему не обязательно идти подряд )",
+        help_text="Он лишь отражает очередность в списке и ему совсем не обязательно идти подряд )",
         null=True,
         blank=True,
     )
 
+    start_time_at = models.TimeField(
+        "Время начала применения набора карт",
+        null=True,
+        blank=True,
+        help_text="Дата и время в которое будет отправляться данный набор карт",
+    )
+
+    end_time_at = models.TimeField(
+        "Время окончания применения набора карт",
+        null=True,
+        blank=True,
+        help_text="Дата и время когда в которое заканчивает отправляться данный набор карт",
+    )
+
     start_date = models.DateField(
-        "Дата применения ротации",
+        "Дата применения набора карт",
         null=True,
         blank=True,
         help_text="При выставлении этой даты - номер в очереди сбрасывается",
     )
 
     class Meta:
-        ordering = [F("queue_number").asc(nulls_first=True), "start_date"]
-        constraints = [
-            models.UniqueConstraint(
-                fields=["rotation", "start_date"],
-                condition=models.Q(start_date__isnull=False),
-                name="rotation_start_date_unique",
-                violation_error_message="Дата начала должна быть уникальной",
-            ),
-        ]
         verbose_name = "набор с картами"
         verbose_name_plural = "наборы с картами"
+        constraints = [
+            models.UniqueConstraint(
+                condition=models.Q(slug__isnull=False),
+                fields=["slug", "rotation"],
+                name="rotation_layers_pack_unique_slug_and_rotation_when_slug_isnull_false",
+            ),
+        ]
 
     def __str__(self) -> str:
-        if self.queue_number is not None:
-            return f"#{self.queue_number}"
-        elif self.start_date is not None:
-            return str(self.start_date.strftime(settings.TIME_FORMAT))
-        else:
-            return "Набор с картами"
+        return "Набор с картами"
 
-    def clean(self):
-        if self.start_date is None and self.queue_number is None:
+    def clean(self) -> None:
+        super().clean()
+
+        if (
+            self.slug
+            and self.__class__.objects.filter(slug=self.slug, rotation_id=self.rotation_id).exclude(pk=self.pk).exists()
+        ):
+            raise ValidationError({"slug": ["Такое название уже есть"]})
+
+        if self.start_date and (self.start_time_at is None or self.end_time_at is None):
             raise ValidationError(
                 {
-                    "start_date": ["Задайте дату начала или номер в очереди"],
-                    "queue_number": ["Задайте дату начала или номер в очереди"],
+                    "__all__": ["Если задана дата применения набора карт - должно быть задано и время"],
+                    "start_time_at": ["Задайте время начала"],
+                    "end_time_at": ["Задайте дату окончания"],
                 }
             )
-        if self.start_date:
-            self.queue_number = None
 
-        super().clean()
+        if self.start_time_at and self.end_time_at:
+            if self.start_time_at > self.end_time_at:
+                raise ValidationError(
+                    {
+                        "start_time_at": ["Дата начала больше даты окончания"],
+                        "end_time_at": ["Дата начала больше даты окончания"],
+                    }
+                )
+            self.queue_number = None
+        elif self.queue_number is None:
+            raise ValidationError(
+                {
+                    "start_time_at": ["Задайте время начала и окончания или номер в очереди"],
+                    "end_time_at": ["Задайте время начала и окончания или номер в очереди"],
+                    "queue_number": ["Задайте время начала и окончания или номер в очереди"],
+                }
+            )
 
 
 class Rotation(models.Model):

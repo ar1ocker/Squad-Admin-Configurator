@@ -1,6 +1,7 @@
 import re
 
 from django import forms
+from django.contrib.admin.widgets import AdminTextareaWidget
 from django.core.exceptions import ValidationError
 from django.urls import reverse
 
@@ -23,7 +24,7 @@ def textarea_form(model, fields: list):
         {
             "fields": "__all__",
             "model": model,
-            "widgets": {field: forms.Textarea() for field in fields},
+            "widgets": {field: AdminTextareaWidget() for field in fields},
         },
     )
 

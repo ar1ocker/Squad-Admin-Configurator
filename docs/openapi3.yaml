@@ -184,6 +184,18 @@ paths:
       description: View set для доступа к привилегированным пользователям
       parameters:
       - in: query
+        name: date_of_end_after
+        schema:
+          type: string
+          format: date-time
+        description: Общая дата окончания полномочий
+      - in: query
+        name: date_of_end_before
+        schema:
+          type: string
+          format: date-time
+        description: Общая дата окончания полномочий
+      - in: query
         name: description
         schema:
           type: string
@@ -809,6 +821,10 @@ paths:
       operationId: v1_api_privileged_servers_privileges_list
       description: View set для доступа к привилегированным пользователям на серверах
       parameters:
+      - in: query
+        name: is_active
+        schema:
+          type: boolean
       - name: limit
         required: false
         in: query
@@ -1062,10 +1078,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/WebhookLog'
           description: ''
-  /v1/api/rotations/{url}/current/:
+  /v1/api/rotations/{url}/:
     get:
-      operationId: v1_api_rotations_current_retrieve
-      description: Получение текущего списка карт
+      operationId: v1_api_rotations_retrieve
       parameters:
       - in: path
         name: url
@@ -1074,34 +1089,18 @@ paths:
         required: true
       tags:
       - v1
-      security:
-      - tokenAuth: []
       responses:
         '200':
-          content:
-            text/plain;charset=UTF-8:
-              schema:
-                type: string
-          description: Текст ротации
-        '404':
-          content:
-            application/json:
-              schema:
-                type: string
-                format: json-pointer
-          description: Ротация не найдена
-        '403':
-          content:
-            application/json:
-              schema:
-                type: string
-                format: json-pointer
-          description: Ротация не активна
-  /v1/api/rotations/{url}/next/:
+          description: No response body
+  /v1/api/rotations/{url}/{slug}/:
     get:
-      operationId: v1_api_rotations_next_retrieve
-      description: Получение следующего в очереди списка карт
+      operationId: v1_api_rotations_retrieve_2
       parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
       - in: path
         name: url
         schema:
@@ -1109,29 +1108,9 @@ paths:
         required: true
       tags:
       - v1
-      security:
-      - tokenAuth: []
       responses:
         '200':
-          content:
-            text/plain;charset=UTF-8:
-              schema:
-                type: string
-          description: Текст ротации
-        '404':
-          content:
-            application/json:
-              schema:
-                type: string
-                format: json-pointer
-          description: Ротация не найдена
-        '403':
-          content:
-            application/json:
-              schema:
-                type: string
-                format: json-pointer
-          description: Ротация не активна
+          description: No response body
 components:
   schemas:
     LevelEnum:
@@ -1291,10 +1270,12 @@ components:
         title:
           type: string
           title: Название
+          description: Название игрового разрешения из конфигурации Admins.cfg в Squad
           maxLength: 100
         description:
           type: string
           title: Описание
+          description: Описание игрового разрешения
           maxLength: 300
     PatchedPrivileged:
       type: object
@@ -1305,25 +1286,32 @@ components:
         name:
           type: string
           title: Имя
+          description: Имя привилегированного пользователя
           maxLength: 200
         steam_id:
           type: integer
+          description: Steam ID 64
         is_active:
           type: boolean
           title: Активирован
+          description: Активирован ли глобально пользователь, если флаг не установлен
+            - пользователь будет убран из конфигурации
         description:
           type: string
           title: Описание
+          description: Описание пользователя
         creation_date:
           type: string
           format: date-time
           readOnly: true
           title: Дата добавления
+          description: Дата добавления пользователя на сайт
         date_of_end:
           type: string
           format: date-time
           nullable: true
           title: Общая дата окончания полномочий
+          description: Дата после которой флаг 'Активирован' будет автоматически выключен
     PatchedRoleSerializerWrite:
       type: object
       properties:
@@ -1338,13 +1326,17 @@ components:
         title:
           type: string
           title: Название
+          description: Название роли
           maxLength: 200
         is_active:
           type: boolean
           title: Активирован
+          description: Активирована ли роль, если флаг не установлен - роль будет
+            убрана из всех конфигураций
         description:
           type: string
           title: Описание
+          description: Описание роли
           maxLength: 300
     PatchedServer:
       type: object
@@ -1355,13 +1347,17 @@ components:
         is_active:
           type: boolean
           title: Активирован
+          description: Активирован ли сервер, если флаг не установлен - конфигурация
+            этого сервера будет пустая
         title:
           type: string
           title: Название
+          description: Название сервера
           maxLength: 50
         description:
           type: string
           title: Описание
+          description: Описание сервера
           maxLength: 300
     PatchedServerPrivilegedSerializerWrite:
       type: object
@@ -1379,16 +1375,20 @@ components:
         is_active:
           type: boolean
           title: Активирована
+          description: Активирована ли данная роль на сервере, если не флаг не установлен
+            - данная роль на сервере будет убрана из конфигурации
         creation_date:
           type: string
           format: date-time
           readOnly: true
           title: Дата добавления
+          description: Дата добавления роли на сервере
         date_of_end:
           type: string
           format: date-time
           nullable: true
           title: Дата окончания роли
+          description: Дата после которой флаг 'Активирован' будет автоматически выключен
         comment:
           type: string
           title: Комментарий
@@ -1396,6 +1396,7 @@ components:
         privileged:
           type: integer
           title: Пользователь
+          description: Привилегированный пользователь которому выдана роль(и) на сервере
     Permission:
       type: object
       properties:
@@ -1405,10 +1406,12 @@ components:
         title:
           type: string
           title: Название
+          description: Название игрового разрешения из конфигурации Admins.cfg в Squad
           maxLength: 100
         description:
           type: string
           title: Описание
+          description: Описание игрового разрешения
           maxLength: 300
       required:
       - id
@@ -1422,25 +1425,32 @@ components:
         name:
           type: string
           title: Имя
+          description: Имя привилегированного пользователя
           maxLength: 200
         steam_id:
           type: integer
+          description: Steam ID 64
         is_active:
           type: boolean
           title: Активирован
+          description: Активирован ли глобально пользователь, если флаг не установлен
+            - пользователь будет убран из конфигурации
         description:
           type: string
           title: Описание
+          description: Описание пользователя
         creation_date:
           type: string
           format: date-time
           readOnly: true
           title: Дата добавления
+          description: Дата добавления пользователя на сайт
         date_of_end:
           type: string
           format: date-time
           nullable: true
           title: Общая дата окончания полномочий
+          description: Дата после которой флаг 'Активирован' будет автоматически выключен
       required:
       - creation_date
       - id
@@ -1455,13 +1465,17 @@ components:
         title:
           type: string
           title: Название
+          description: Название роли
           maxLength: 200
         is_active:
           type: boolean
           title: Активирован
+          description: Активирована ли роль, если флаг не установлен - роль будет
+            убрана из всех конфигураций
         description:
           type: string
           title: Описание
+          description: Описание роли
           maxLength: 300
       required:
       - id
@@ -1480,13 +1494,17 @@ components:
         title:
           type: string
           title: Название
+          description: Название роли
           maxLength: 200
         is_active:
           type: boolean
           title: Активирован
+          description: Активирована ли роль, если флаг не установлен - роль будет
+            убрана из всех конфигураций
         description:
           type: string
           title: Описание
+          description: Описание роли
           maxLength: 300
       required:
       - id
@@ -1518,13 +1536,17 @@ components:
         is_active:
           type: boolean
           title: Активирован
+          description: Активирован ли сервер, если флаг не установлен - конфигурация
+            этого сервера будет пустая
         title:
           type: string
           title: Название
+          description: Название сервера
           maxLength: 50
         description:
           type: string
           title: Описание
+          description: Описание сервера
           maxLength: 300
       required:
       - id
@@ -1538,16 +1560,20 @@ components:
         is_active:
           type: boolean
           title: Активирована
+          description: Активирована ли данная роль на сервере, если не флаг не установлен
+            - данная роль на сервере будет убрана из конфигурации
         creation_date:
           type: string
           format: date-time
           readOnly: true
           title: Дата добавления
+          description: Дата добавления роли на сервере
         date_of_end:
           type: string
           format: date-time
           nullable: true
           title: Дата окончания роли
+          description: Дата после которой флаг 'Активирован' будет автоматически выключен
         comment:
           type: string
           title: Комментарий
@@ -1555,15 +1581,18 @@ components:
         server:
           type: integer
           title: Сервер
+          description: Сервер на котором выдана роль
         privileged:
           type: integer
           title: Пользователь
+          description: Привилегированный пользователь которому выдана роль(и) на сервере
         roles:
           type: array
           items:
             type: integer
             title: Роль
           title: Роль
+          description: Список ролей
       required:
       - creation_date
       - id
@@ -1586,16 +1615,20 @@ components:
         is_active:
           type: boolean
           title: Активирована
+          description: Активирована ли данная роль на сервере, если не флаг не установлен
+            - данная роль на сервере будет убрана из конфигурации
         creation_date:
           type: string
           format: date-time
           readOnly: true
           title: Дата добавления
+          description: Дата добавления роли на сервере
         date_of_end:
           type: string
           format: date-time
           nullable: true
           title: Дата окончания роли
+          description: Дата после которой флаг 'Активирован' будет автоматически выключен
         comment:
           type: string
           title: Комментарий
@@ -1603,6 +1636,7 @@ components:
         privileged:
           type: integer
           title: Пользователь
+          description: Привилегированный пользователь которому выдана роль(и) на сервере
       required:
       - creation_date
       - id
